@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+  web:
+    image: expense-tracker-group1
+    container_name: expense-tracker-container-new
+    ports:
+      - "5002:5002"
+    build:
+      context: .
+      dockerfile: Dockerfile
