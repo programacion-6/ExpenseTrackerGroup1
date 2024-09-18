@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+  webapp:
+    container_name: expense-tracker-container-api
+    ports:
+      - "5002:5002"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Database__ConnectionString__DefaultConnection=Host=db;Port=5432;Database=expense_tracker_group_1_postgres;Username=expense_tracker_group_one;Password=122134435
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  # posgreSQL database
+  db:
+    container_name: expense-tracker-db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: expense_tracker_group_1_postgres
+      POSTGRES_USER: expense_tracker_group_one
+      POSTGRES_PASSWORD: 122134435
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U expense_tracker_group_one -d expense_tracker_group_1_postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
