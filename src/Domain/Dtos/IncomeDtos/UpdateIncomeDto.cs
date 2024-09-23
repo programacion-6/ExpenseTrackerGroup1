@@ -1,4 +1,4 @@
-public class UpdateIncomeDto
+public class UpdateIncomeDto : IDto<Income>
 {
     public decimal Amount { get; set; }
     public string Source { get; set; }

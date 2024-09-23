@@ -48,19 +48,4 @@ public class IncomeRepository
         var sql = "DELETE FROM Incomes WHERE Id = @Id RETURNING *;";
         return await _dbConnection.QuerySingleOrDefaultAsync<Income>(sql, new { Id = entityId });
     }
-
-    public async Task<List<Income>> GetAllEntities(QueryObject query)
-    {
-        var sql = "SELECT * FROM Incomes ORDER BY CreatedAt " +
-                  (query.IsDescending ? "DESC" : "ASC") +
-                  " OFFSET @Offset LIMIT @Limit;";
-
-        var parameters = new
-        {
-            Offset = (query.PageNumber - 1) * query.PageSize,
-            Limit = query.PageSize
-        };
-
-        return (await _dbConnection.QueryAsync<Income>(sql, parameters)).AsList();
-    }
 }
