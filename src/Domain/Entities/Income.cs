@@ -1,4 +1,4 @@
-public class Income
+public class Income : IEntity
 {
     public Guid Id { get; private set; }
     public Guid UserId { get; private set; }
