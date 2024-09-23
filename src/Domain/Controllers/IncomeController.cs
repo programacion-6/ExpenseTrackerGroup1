@@ -58,11 +58,4 @@ public class IncomeController : ControllerBase
 
         return NoContent();
     }
-/**
-    [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
-    {
-        var incomes = await _incomeRepository.GetAllEntities(query);
-        return Ok(incomes);
-    }**/
 }
