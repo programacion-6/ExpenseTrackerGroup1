@@ -1,3 +1,50 @@
-/bin
-/obj
-.vscode
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+.idea/*
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+out/
+
+# Rider specific files
+*.sln.DotSettings.user
+*.sln.DotSettings
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+
+# Logs
+*.log
+
+# User-specific files
+*.user
+*.userprefs
+*.suo
+
+# Backup files
+*~
+*.bak
+
+# Config files
+appsettings.Development.json
+appsettings.Production.json
+
+# Secrets
+secrets.json
+
+# Database files
+*.mdf
+*.ldf
+
+# Temporary files
+*.tmp
+*.temp
