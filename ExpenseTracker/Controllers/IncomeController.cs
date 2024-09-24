@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ExpenseTracker.Dtos.IncomeDtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -37,7 +38,7 @@ public class IncomeController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateIncomeDto updateIncomeDto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] IDto<Income> updateIncomeDto)
     {
         if (updateIncomeDto == null)
             return BadRequest("Invalid income data.");

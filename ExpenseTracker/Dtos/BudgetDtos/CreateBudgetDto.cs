@@ -1,17 +1,20 @@
-namespace ExpenseTracker.Domain;
+namespace ExpenseTracker.Dtos.BudgetDtos;
 
-public class Budget : IEntity
+public class CreateBudgetDto
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public decimal BudgetAmount { get; set; }
     public string Month { get; set; }
 
-    public Budget(Guid id, Guid userId, decimal budgetAmount, string month)
+    public CreateBudgetDto(Guid userId, decimal budgetAmount, string month)
     {
-        Id = id;
         UserId = userId;
         BudgetAmount = budgetAmount;
         Month = month;
+    }
+
+    public CreateBudgetDto GetDto()
+    {
+        return this;
     }
 }

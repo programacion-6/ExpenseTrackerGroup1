@@ -3,17 +3,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # restore
-COPY ["src/Domain/ExpenseTrackerGroup1.csproj", "Domain/"]
-RUN dotnet restore 'Domain/ExpenseTrackerGroup1.csproj'
+COPY ["./ExpenseTracker/ExpenseTracker.csproj", "ExpenseTracker/"]
+RUN dotnet restore 'ExpenseTracker/ExpenseTracker.csproj'
 
 # build
-COPY ["src/Domain", "Domain/"]
-WORKDIR /src/Domain
-RUN dotnet build 'ExpenseTrackerGroup1.csproj' -c Release -o /app/build
+COPY ["./ExpenseTracker", "ExpenseTracker/"]
+WORKDIR /src/ExpenseTracker
+RUN dotnet build 'ExpenseTracker.csproj' -c Release -o /app/build
 
 # Stage 2: Publish Stage
 FROM build as publish
-RUN dotnet publish 'ExpenseTrackerGroup1.csproj' -c Release -o /app/publish
+RUN dotnet publish 'ExpenseTracker.csproj' -c Release -o /app/publish
 
 # Stage 3: Run Stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
@@ -21,4 +21,4 @@ ENV ASPNETCORE_HTTP_PORTS=5001
 EXPOSE 5002
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ExpenseTrackerGroup1.dll"]
+ENTRYPOINT ["dotnet", "ExpenseTracker.dll"]
