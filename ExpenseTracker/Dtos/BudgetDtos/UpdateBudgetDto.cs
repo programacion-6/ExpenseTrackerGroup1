@@ -1,10 +1,12 @@
+using ExpenseTracker.Domain;
+
 namespace ExpenseTracker.Dtos.BudgetDtos;
 
-public class UpdateBudgetDto
+public class UpdateBudgetDto : IDto<UpdateBudgetDto>
 {
     public decimal BudgetAmount { get; set; }
 
-    public UpdateBudgetDto(decimal budgetAmount)
+    UpdateBudgetDto(decimal budgetAmount)
     {
         BudgetAmount = budgetAmount;
     }

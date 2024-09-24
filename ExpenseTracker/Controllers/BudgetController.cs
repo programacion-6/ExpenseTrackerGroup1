@@ -77,4 +77,17 @@ public class BudgetController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] IDto<Budget> updateBudgetDto)
+    {
+        if (updateBudgetDto == null)
+            return BadRequest("Budget data is required.");
+
+        var updatedBudget = await _budgetRepository.UpdateEntity(id, updateBudgetDto);
+        if (updatedBudget == null)
+            return NotFound("Budget not found.");
+        
+        return Ok(updatedBudget);
+    }
 }
