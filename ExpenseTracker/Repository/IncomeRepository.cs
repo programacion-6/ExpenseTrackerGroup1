@@ -3,6 +3,7 @@ using Dapper;
 using System.Data;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using ExpenseTracker.Dtos.IncomeDtos;
 using Npgsql;
 
 public class IncomeRepository

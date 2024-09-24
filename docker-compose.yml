@@ -15,8 +15,7 @@ services:
       db:
         condition: service_healthy
 
-
-  # posgreSQL database
+  # PostgreSQL database
   db:
     container_name: expense-tracker-db
     image: postgres:latest

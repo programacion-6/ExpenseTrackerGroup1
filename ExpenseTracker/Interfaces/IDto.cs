@@ -1,3 +1,4 @@
-public interface IDto<T> {
-
+public interface IDto<T>
+{
+    T GetDto();
 }
