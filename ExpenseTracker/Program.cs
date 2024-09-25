@@ -1,13 +1,17 @@
+using ExpenseTracker.Configuration;
+using ExpenseTracker.Utils;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 builder.Services.AddControllers();
+builder.Services.AddConfig(builder.Configuration);
+
 
 var app = builder.Build();
+app.InitializeDatabase();
 
 
 if (app.Environment.IsDevelopment())
