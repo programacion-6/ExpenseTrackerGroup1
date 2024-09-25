@@ -1,12 +1,14 @@
-public class Expense
+namespace ExpenseTracker.Domain;
+
+public class Expense : IEntity
 {
-    public Guid Id { get; private set; }
-    public Guid UserId { get; private set; }
-    public decimal Amount { get; private set; }
-    public string Description { get; private set; }
-    public string Category { get; private set; }
-    public DateTime Date { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public decimal Amount { get; set; }
+    public string Description { get; set; }
+    public string Category { get; set; }
+    public DateTime Date { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     public Expense(Guid userId, decimal amount, string description, string category, DateTime date)
     {
@@ -17,6 +19,10 @@ public class Expense
         Category = category;
         Date = date;
         CreatedAt = DateTime.UtcNow;
+    }
+
+    public Expense()
+    {
     }
 
     public void UpdateDetails(decimal amount, string category, string description)
