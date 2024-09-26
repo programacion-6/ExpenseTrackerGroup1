@@ -1,20 +1,21 @@
 using ExpenseTracker.Domain;
 using ExpenseTracker.Interfaces;
 
-public class UpdateBudgetDto : IDto<Budget>
+namespace ExpenseTracker.Dtos.BudgetDtos;
+
+public class UpdateBudgetDto : IInDto<Budget>
 {
     public decimal BudgetAmount { get; set; }
 
-    public UpdateBudgetDto(decimal budgetAmount)
+    public Budget GetEntity(Budget? entity)
     {
-        BudgetAmount = budgetAmount;
-    }
-
-    public Budget GetEntity(Budget entity)
-    {
+        if (entity == null) throw new ArgumentNullException(nameof(entity));
         return new Budget
         {
-            BudgetAmount = this.BudgetAmount,
+            UserId = entity.UserId,
+            BudgetAmount = BudgetAmount,
+            Month = entity.Month,
+            Id = entity.Id
         };
     }
 }
