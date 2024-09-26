@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS Budget (
     UserId UUID NOT NULL REFERENCES Users(Id) ON DELETE CASCADE,
     BudgetAmount DECIMAL(18, 2) NOT NULL CHECK (BudgetAmount >= 0), 
     Month VARCHAR(7) NOT NULL, 
-    CONSTRAINT uq_budget UNIQUE (UserId, Month) 
 );
 
 CREATE TABLE IF NOT EXISTS Expense (

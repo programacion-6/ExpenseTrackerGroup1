@@ -1,6 +1,6 @@
 namespace ExpenseTracker.Persistence;
 
-public class DatabaseOptions
+public class DbOptions
 {
     public const string ConnectionStrings = nameof(ConnectionStrings);
     public string? DefaultConnection { get; set; }

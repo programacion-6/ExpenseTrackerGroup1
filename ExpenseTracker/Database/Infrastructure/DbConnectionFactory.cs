@@ -7,9 +7,9 @@ namespace ExpenseTracker.Persistence.Database.Infrastructure;
 
 public class DbConnectionFactory : IDbConnectionFactory
 {
-    private readonly DatabaseOptions _options;
+    private readonly DbOptions _options;
 
-    public DbConnectionFactory(IOptions<DatabaseOptions> options)
+    public DbConnectionFactory(IOptions<DbOptions> options)
     {
         _options = options.Value;
     }

@@ -35,16 +35,16 @@ INSERT INTO Expense (Id, UserId, Amount, Description, Category, Date, CreatedAt)
     (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Miguel Castillo'), 75.00, 'Books', 'Education', '2024-09-14', CURRENT_TIMESTAMP);
 
 INSERT INTO Goal (Id, UserId, GoalAmount, CurrentAmount, Deadline) VALUES
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 5000.00, 1000.00, '2025-12-31'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Jane Smith'), 8000.00, 2500.00, '2026-06-30'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Carlos García'), 3000.00, 500.00, '2025-09-01'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Ana Martinez'), 1500.00, 700.00, '2024-12-31'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Sara Lopez'), 2000.00, 400.00, '2025-03-31'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Luis Rodríguez'), 10000.00, 5000.00, '2027-12-31'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Maria Torres'), 6000.00, 3500.00, '2025-06-30'),
-    (gen_random_uuid()), (SELECT Id FROM Users WHERE Name = 'David Alvarez'), 4000.00, 1200.00, '2024-11-30'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Paula Perez'), 2500.00, 500.00, '2024-10-31'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Miguel Castillo'), 12000.00, 3000.00, '2028-12-31');
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 5000.00, 1000.00, '2025-12-31'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Jane Smith'), 8000.00, 2500.00, '2026-06-30'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Carlos García'), 3000.00, 500.00, '2025-09-01'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Ana Martinez'), 1500.00, 700.00, '2024-12-31'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Sara Lopez'), 2000.00, 400.00, '2025-03-31'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Luis Rodríguez'), 10000.00, 5000.00, '2027-12-31'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Maria Torres'), 6000.00, 3500.00, '2025-06-30'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'David Alvarez'), 4000.00, 1200.00, '2024-11-30'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Paula Perez'), 2500.00, 500.00, '2024-10-31'),
+   (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Miguel Castillo'), 12000.00, 3000.00, '2028-12-31');
 
 INSERT INTO Income (Id, UserId, Amount, Source, Date, CreatedAt) VALUES
     (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 1500.00, 'Freelancing', '2024-09-05', CURRENT_TIMESTAMP),

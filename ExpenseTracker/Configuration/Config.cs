@@ -20,12 +20,7 @@ public static class Config
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.ConnectionStrings));
-        services.AddScoped<IDbConnection>(sp =>
-        {
-            var connectionString = configuration.GetConnectionString("DefaultConnection"); 
-            return new NpgsqlConnection(connectionString); 
-        });
+        services.Configure<DbOptions>(configuration.GetSection(DbOptions.ConnectionStrings));
         services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
         services.AddScoped<IDbInit, DbInit>();
         return services;
@@ -34,9 +29,7 @@ public static class Config
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddScoped<IBudgetRepository, BudgetRepository>();
-        //services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IGoalRepository, GoalRepository>();
-        //services.AddScoped<IIncomeRepository, IncomeRepository>();
         return services;
     }
     
