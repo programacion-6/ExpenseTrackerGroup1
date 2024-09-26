@@ -43,6 +43,7 @@ public static class Config
     {
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IBudgetService, BudgetService>();
+        services.AddScoped<IGoalService, GoalService>();
         return services;
     }
 }

@@ -1,67 +1,86 @@
-using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Dtos.GoalDtos;
-using ExpenseTracker.Interfaces;
-using ExpenseTracker.Repository;
+using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenseTracker.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class GoalController : ControllerBase
+namespace ExpenseTracker.Controllers
 {
-    private readonly IGoalRepository _goalRepository;
-
-    public GoalController(IGoalRepository goalRepository)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class GoalController : ControllerBase
     {
-        _goalRepository = goalRepository;
-    }
-    
-    [HttpPost]
-    public async Task<IActionResult> CreateGoal([FromBody] CreateGoalInDto createGoalInDto, [FromQuery] Guid userId)
-    {
-        if (createGoalInDto == null)
-            return BadRequest("Goal data is required.");
+        private readonly IGoalService _goalService;
 
-        var goal = new Goal
+        public GoalController(IGoalService goalService)
         {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            GoalAmount = createGoalInDto.GoalAmount,
-            Deadline = createGoalInDto.Deadline,
-            CurrentAmount = 0
-        };
+            _goalService = goalService;
+        }
 
-        var createdGoal = await _goalRepository.CreateEntity(goal);
-        return CreatedAtAction(nameof(GetGoal), new { id = createdGoal.Id }, createdGoal);
-    }
-    
-    [HttpGet]
-    public async Task<IActionResult> GetGoals([FromQuery] Guid userId)
-    {
-        var goals = await _goalRepository.GetGoalsByUserId(userId);
-        return Ok(goals);
-    }
-    
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetGoal(Guid id)
-    {
-        var goal = await _goalRepository.ReadEntity(id);
-        if (goal == null)
-            return NotFound("Goal not found.");
-        
-        return Ok(goal);
-    }
-    
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateGoal(Guid id, [FromBody] UpdateGoalInDto updateGoalInDto)
-    {
-        if (updateGoalInDto == null)
-            return BadRequest("Goal data is required.");
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetGoalById(Guid id)
+        {
+            try
+            {
+                var goal = await _goalService.GetGoalByIdAsync(id);
+                if (goal == null)
+                    return NotFound("Goal not found.");
 
-        var updatedGoal = await _goalRepository.UpdateEntity(id, updateGoalInDto.GetEntity(null));
-        if (updatedGoal == null)
-            return NotFound("Goal not found.");
+                return Ok(goal);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-        return Ok(updatedGoal);
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetGoalsByUserId(Guid userId)
+        {
+            try
+            {
+                var goals = await _goalService.GetGoalsByUserIdAsync(userId);
+                return Ok(goals);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateGoal([FromBody] CreateGoalDto createGoalDto)
+        {
+            if (createGoalDto == null)
+                return BadRequest("Goal data cannot be null.");
+
+            try
+            {
+                var createdGoal = await _goalService.CreateGoalAsync(createGoalDto);
+                return CreatedAtAction(nameof(GetGoalById), new { id = createdGoal.UserId }, createdGoal);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateGoal(Guid id, [FromBody] UpdateGoalDto updateGoalDto)
+        {
+            if (updateGoalDto == null)
+                return BadRequest("Goal data cannot be null.");
+
+            try
+            {
+                var updated = await _goalService.UpdateGoalAsync(id, updateGoalDto);
+                if (!updated)
+                    return NotFound("Goal not found or update failed.");
+
+                return Ok("Goal updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
