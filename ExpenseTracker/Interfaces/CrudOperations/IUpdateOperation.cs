@@ -1,4 +1,6 @@
+using ExpenseTracker.Interfaces;
+
 public interface IUpdateOperation<T> where T : IEntity
 {
-    Task<T?> UpdateEntity(Guid entityId, IDto<T> entityDto);
+    Task<bool> UpdateEntity(Guid entityId, T entity);
 }

@@ -1,28 +1,9 @@
-public class User
+namespace ExpenseTracker.Domain;
+
+public class User : IEntity
 {
-    public Guid Id { get; private set; }
-    public string Name { get; private set; }
-    public string Email { get; private set; }
-    public string PasswordHash { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-
-    public User(string name, string email, string passwordHash)
-    {
-        Id = Guid.NewGuid();
-        Name = name;
-        Email = email;
-        PasswordHash = passwordHash;
-        CreatedAt = DateTime.UtcNow;
-    }
-
-    public void UpdateProfile(string name, string email)
-    {
-        Name = name;
-        Email = email;
-    }
-
-    public void UpdatePassword(string newPasswordHash)
-    {
-        PasswordHash = newPasswordHash;
-    }
+    public Guid Id { get; set; }
+    public string Name {get; set;}
+    public string Email {get; set;}
+    public string PasswordHash {get; set;}
 }

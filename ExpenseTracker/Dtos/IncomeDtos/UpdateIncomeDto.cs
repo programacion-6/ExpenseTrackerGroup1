@@ -1,3 +1,5 @@
+using ExpenseTracker.Interfaces;
+
 namespace ExpenseTracker.Dtos.IncomeDtos;
 
 public class UpdateIncomeDto : IDto<UpdateIncomeDto>
@@ -13,7 +15,7 @@ public class UpdateIncomeDto : IDto<UpdateIncomeDto>
         Date = date;
     }
     
-    public UpdateIncomeDto GetDto()
+    public UpdateIncomeDto GetEntity(UpdateIncomeDto entity)
     {
         return this;
     }

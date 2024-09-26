@@ -86,7 +86,7 @@ public class BudgetController : ControllerBase
 
         if (updateBudgetDto is UpdateBudgetDto dto)
         {
-            var updatedBudget = await _budgetRepository.UpdateEntity(id, dto);
+            var updatedBudget = await _budgetRepository.UpdateEntity(id, dto.GetEntity(null));
             if (updatedBudget == null)
                 return NotFound("Budget not found.");
 

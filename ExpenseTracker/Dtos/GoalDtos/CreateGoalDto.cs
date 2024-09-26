@@ -1,3 +1,5 @@
+using ExpenseTracker.Interfaces;
+
 namespace ExpenseTracker.Dtos.GoalDtos;
 
 public class CreateGoalDto : IDto<CreateGoalDto>
@@ -11,7 +13,7 @@ public class CreateGoalDto : IDto<CreateGoalDto>
         Deadline = deadline;
     }
 
-    public CreateGoalDto GetDto()
+    public CreateGoalDto GetEntity(CreateGoalDto entity)
     {
         return this;
     }
