@@ -1,3 +1,5 @@
+using ExpenseTracker.Interfaces;
+
 namespace ExpenseTracker.Dtos.GoalDtos;
 
 public class UpdateGoalDto : IDto<Goal>
@@ -6,14 +8,7 @@ public class UpdateGoalDto : IDto<Goal>
     public DateTime Deadline { get; set; }
     public decimal CurrentAmount { get; set; }
 
-    public UpdateGoalDto(decimal goalAmount, DateTime deadline, decimal currentAmount)
-    {
-        GoalAmount = goalAmount;
-        Deadline = deadline;
-        CurrentAmount = currentAmount;
-    }
-
-    public Goal GetDto()
+    public Goal GetEntity(Goal entity)
     {
         return new Goal
         {

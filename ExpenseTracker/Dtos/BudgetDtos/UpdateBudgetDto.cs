@@ -1,4 +1,5 @@
 using ExpenseTracker.Domain;
+using ExpenseTracker.Interfaces;
 
 public class UpdateBudgetDto : IDto<Budget>
 {
@@ -9,7 +10,7 @@ public class UpdateBudgetDto : IDto<Budget>
         BudgetAmount = budgetAmount;
     }
 
-    public Budget GetDto()
+    public Budget GetEntity(Budget entity)
     {
         return new Budget
         {
