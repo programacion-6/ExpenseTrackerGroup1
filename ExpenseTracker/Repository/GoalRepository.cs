@@ -19,7 +19,6 @@ public class GoalRepository : IGoalRepository
         var sql = @"INSERT INTO Goal (Id, UserId, GoalAmount, Deadline, CurrentAmount) 
                         VALUES (@Id, @UserId, @GoalAmount, @Deadline, @CurrentAmount)";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
         await connection.ExecuteAsync(sql, entityModel);
         return entityModel;
     }
@@ -28,7 +27,6 @@ public class GoalRepository : IGoalRepository
     {
         var sql = @"SELECT * FROM Goal WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
         return await connection.QueryFirstOrDefaultAsync<Goal>(sql, new { Id = entityId });
     }
 
@@ -36,9 +34,7 @@ public class GoalRepository : IGoalRepository
     {
         var sql = @"SELECT * FROM Goal WHERE UserId = @UserId";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
         return await connection.QueryAsync<Goal>(sql, new { UserId = userId });
-        
     }
 
     public async Task<bool> UpdateEntity(Guid entityId, Goal entity)

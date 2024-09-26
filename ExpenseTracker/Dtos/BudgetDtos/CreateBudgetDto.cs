@@ -1,20 +1,22 @@
+using ExpenseTracker.Domain;
+using ExpenseTracker.Interfaces;
+
 namespace ExpenseTracker.Dtos.BudgetDtos;
 
-public class CreateBudgetDto
+public class CreateBudgetDto : IInDto<Budget>
 {
     public Guid UserId { get; set; }
     public decimal BudgetAmount { get; set; }
-    public string Month { get; set; }
-
-    public CreateBudgetDto(Guid userId, decimal budgetAmount, string month)
+    public DateTime Month { get; set; }
+    
+    public Budget GetEntity(Budget? entity)
     {
-        UserId = userId;
-        BudgetAmount = budgetAmount;
-        Month = month;
-    }
-
-    public CreateBudgetDto GetDto()
-    {
-        return this;
+        return new Budget
+        {
+            Id = Guid.NewGuid(),
+            UserId = UserId,
+            Month = new DateTime(Month.Year, Month.Month, 1),
+            BudgetAmount = BudgetAmount,
+        };
     }
 }

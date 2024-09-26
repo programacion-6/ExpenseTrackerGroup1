@@ -31,16 +31,16 @@ public class IncomeRepository
         return await _dbConnection.QuerySingleOrDefaultAsync<Income>(sql, new { Id = entityId });
     }
 
-    public async Task<Income?> UpdateEntity(Guid entityId, UpdateIncomeDto entityDto)
+    public async Task<Income?> UpdateEntity(Guid entityId, UpdateIncomeInDto entityInDto)
     {
         var sql = "UPDATE Incomes SET Amount = @Amount, Source = @Source, Date = @Date " +
                   "WHERE Id = @Id RETURNING *;";
         var updatedIncome = await _dbConnection.QuerySingleOrDefaultAsync<Income>(sql, new
         {
             Id = entityId,
-            Amount = entityDto.Amount,
-            Source = entityDto.Source,
-            Date = entityDto.Date
+            Amount = entityInDto.Amount,
+            Source = entityInDto.Source,
+            Date = entityInDto.Date
         });
         return updatedIncome;
     }

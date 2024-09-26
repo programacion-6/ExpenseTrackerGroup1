@@ -1,99 +1,125 @@
-using Microsoft.AspNetCore.Mvc;
-using ExpenseTracker.Domain;
 using ExpenseTracker.Dtos.BudgetDtos;
-using ExpenseTracker.Interfaces;
+using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ExpenseTracker.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class BudgetController : ControllerBase
+namespace ExpenseTracker.Controllers
 {
-    private readonly IBudgetRepository _budgetRepository;
-
-    public BudgetController(IBudgetRepository budgetRepository)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class BudgetController : ControllerBase
     {
-        _budgetRepository = budgetRepository;
-    }
+        private readonly IBudgetService _budgetService;
 
-    [HttpPost]
-    public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetDto createBudgetDto)
-    {
-        if (createBudgetDto == null)
-            return BadRequest("Budget data is required.");
-
-        var budget = new Budget(Guid.NewGuid(), createBudgetDto.UserId, createBudgetDto.BudgetAmount, createBudgetDto.Month);
-        var createdBudget = await _budgetRepository.CreateEntity(budget);
-        
-        return CreatedAtAction(nameof(GetMonthlyBudget), new { userId = createdBudget.UserId, month = createdBudget.Month }, createdBudget);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetCurrentMonthBudget(Guid userId)
-    {
-        try
+        public BudgetController(IBudgetService budgetService)
         {
-            var currentMonth = DateTime.UtcNow;
-            var budget = await _budgetRepository.GetMonthlyBudget(userId, currentMonth);
-            return Ok(budget);
+            _budgetService = budgetService;
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-    }
 
-    [HttpGet("{month}")]
-    public async Task<IActionResult> GetMonthlyBudget(Guid userId, string month)
-    {
-        if (DateTime.TryParse($"{month}-01", out var parsedMonth))
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBudgetById(Guid id)
         {
             try
             {
-                var budget = await _budgetRepository.GetMonthlyBudget(userId, parsedMonth);
+                var budget = await _budgetService.ReadEntity(id);
+                if (budget == null)
+                {
+                    return NotFound("Budget not found.");
+                }
+
+                var budgetDto = new BudgetDto().GetDto(budget);
+                return Ok(budgetDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("monthly")]
+        public async Task<IActionResult> GetMonthlyBudget([FromQuery] Guid userId, [FromQuery] DateTime month)
+        {
+            try
+            {
+                var budget = await _budgetService.GetMonthlyBudget(userId, new DateTime(month.Year, month.Month, 1));
+                if (budget == null)
+                {
+                    return NotFound("Budget not found for the specified month.");
+                }
+
+                var budgetDto = new BudgetDto().GetDto(budget);
                 return Ok(budget);
             }
-            catch (KeyNotFoundException ex)
+            catch (ArgumentException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
-        else
+
+        [HttpGet("current")]
+        public async Task<IActionResult> GetCurrentMonthBudget([FromQuery] Guid userId)
         {
-            return BadRequest("Invalid month format. Use 'yyyy-MM'.");
+            try
+            {
+                var budget = await _budgetService.GetCurrentMonthBudget(userId);
+                if (budget == null)
+                {
+                    return NotFound("Budget not found for the current month.");
+                }
+
+                var budgetDto = new BudgetDto().GetDto(budget);
+                return Ok(budget);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetDto createBudgetDto)
+        {
+            if (createBudgetDto == null)
+            {
+                return BadRequest("Budget data cannot be null.");
+            }
+
+            try
+            {
+                var budget = await _budgetService.CreateEntity(createBudgetDto);
+                var budgetDto = new BudgetDto().GetDto(budget);
+                return CreatedAtAction(nameof(GetBudgetById), budget);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] UpdateBudgetDto updateBudgetDto)
+        {
+            if (updateBudgetDto == null)
+            {
+                return BadRequest("Budget data cannot be null.");
+            }
+
+            try
+            {
+                var updated = await _budgetService.UpdateEntity(id, updateBudgetDto);
+                if (updated)
+                {
+                    return Ok("Budget updated successfully.");
+                }
+                else
+                {
+                    return NotFound("Budget not found.");
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
     }
-
-    [HttpGet("remaining")]
-    public async Task<IActionResult> GetRemainingBudget(Guid userId)
-    {
-        try
-        {
-            var budget = await _budgetRepository.GetRemainingBudget(userId);
-            return Ok(budget);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-    }
-    
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] UpdateBudgetDto updateBudgetDto)
-    {
-        if (updateBudgetDto == null)
-            return BadRequest("Budget data is required.");
-
-        if (updateBudgetDto is UpdateBudgetDto dto)
-        {
-            var updatedBudget = await _budgetRepository.UpdateEntity(id, dto.GetEntity(null));
-            if (updatedBudget == null)
-                return NotFound("Budget not found.");
-
-            return Ok(updatedBudget);
-        }
-
-        return BadRequest("Invalid DTO type provided.");
-    }
-
 }

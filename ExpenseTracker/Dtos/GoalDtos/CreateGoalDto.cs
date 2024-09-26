@@ -2,19 +2,22 @@ using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.GoalDtos;
 
-public class CreateGoalDto : IDto<CreateGoalDto>
+public class CreateGoalDto : IInDto<Goal>
 {
+    public Guid UserId { get; set; }
+
     public decimal GoalAmount { get; set; }
     public DateTime Deadline { get; set; }
 
-    public CreateGoalDto(decimal goalAmount, DateTime deadline)
+    public Goal GetEntity(Goal? entity)
     {
-        GoalAmount = goalAmount;
-        Deadline = deadline;
-    }
-
-    public CreateGoalDto GetEntity(CreateGoalDto entity)
-    {
-        return this;
+        return new Goal
+        {
+            Id = Guid.NewGuid(),
+            GoalAmount = GoalAmount ,
+            CurrentAmount = 0,
+            UserId = UserId,
+            Deadline = Deadline
+        };
     }
 }

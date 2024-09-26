@@ -39,12 +39,12 @@ public class IncomeController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] IDto<Income> updateIncomeDto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] IInDto<Income> updateIncomeInDto)
     {
-        if (updateIncomeDto == null)
+        if (updateIncomeInDto == null)
             return BadRequest("Invalid income data.");
 
-        var updatedIncome = await _incomeRepository.UpdateEntity(id, updateIncomeDto.GetEntity(null));
+        var updatedIncome = await _incomeRepository.UpdateEntity(id, updateIncomeInDto.GetEntity(null));
         if (updatedIncome == null)
             return NotFound();
 

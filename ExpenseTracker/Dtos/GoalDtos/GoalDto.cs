@@ -1,19 +1,23 @@
+using ExpenseTracker.Interfaces.Service;
+
 namespace ExpenseTracker.Dtos.GoalDtos;
 
-public class GoalDto
+public class GoalDto : IOutDto<GoalDto, Goal>
 {
-    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
     public decimal GoalAmount { get; set; }
     public decimal CurrentAmount { get; set; }
     public DateTime Deadline { get; set; }
-    public bool IsComplete { get; set; }
+    
 
-    public GoalDto(Guid id, decimal goalAmount, decimal currentAmount, DateTime deadline)
+    public GoalDto GetDto(Goal entity)
     {
-        Id = id;
-        GoalAmount = goalAmount;
-        CurrentAmount = currentAmount;
-        Deadline = deadline;
-        IsComplete = currentAmount >= goalAmount;
+        return new GoalDto
+        {
+            UserId = entity.UserId,
+            CurrentAmount = entity.CurrentAmount,
+            GoalAmount = entity.GoalAmount,
+            Deadline = entity.Deadline,
+        };
     }
 }
