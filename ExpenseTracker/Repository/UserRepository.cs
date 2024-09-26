@@ -54,4 +54,20 @@ public class UserRepository : IUserRepository
         using var connection = await _dbConnection.CreateConnectionAsync();
         return await connection.QueryFirstOrDefaultAsync<User>(sql, new { Email = email });
     }
+
+    public async Task<User> CreateEntity(User entityModel)
+    {
+        var sql = @"INSERT INTO Users (Id, Name, Email, PasswordHash)
+                    VALUES (@Id, @Name, @Email, @PasswordHash)";
+        using var connection = await _dbConnection.CreateConnectionAsync();
+        await connection.ExecuteAsync(sql, new 
+        {
+            entityModel.Id,
+            entityModel.Name,
+            entityModel.Email,
+            entityModel.PasswordHash
+        });
+
+        return entityModel;
+    }
 }

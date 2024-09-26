@@ -1,7 +1,9 @@
+using DotNetEnv;
 using ExpenseTracker.Configuration;
 using ExpenseTracker.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+Env.Load();
 
 
 builder.Services.AddEndpointsApiExplorer();
