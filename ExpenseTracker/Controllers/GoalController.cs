@@ -58,7 +58,7 @@ public class GoalController : ControllerBase
         if (updateGoalDto == null)
             return BadRequest("Goal data is required.");
 
-        var updatedGoal = await _goalRepository.UpdateEntity(id, updateGoalDto);
+        var updatedGoal = await _goalRepository.UpdateEntity(id, updateGoalDto.GetEntity(null));
         if (updatedGoal == null)
             return NotFound("Goal not found.");
 

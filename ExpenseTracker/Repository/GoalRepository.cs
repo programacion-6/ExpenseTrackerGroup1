@@ -41,28 +41,15 @@ public class GoalRepository : IGoalRepository
         
     }
 
-    public async Task<Goal?> UpdateEntity(Guid entityId, IDto<Goal> entityDto)
+    public async Task<bool> UpdateEntity(Guid entityId, Goal entity)
     {
-        var existingGoal = await ReadEntity(entityId);
-        if (existingGoal == null)
-        {
-            return null; 
-        }
-        var updatedGoal = entityDto.GetEntity(new Goal{Id = entityId});
         var sql = @"UPDATE Goal 
                         SET GoalAmount = @GoalAmount, 
                             Deadline = @Deadline, 
                             CurrentAmount = @CurrentAmount 
                         WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
-        await connection.ExecuteAsync(sql, new
-        {
-            Id = entityId,
-            GoalAmount = updatedGoal.GoalAmount,
-            Deadline = updatedGoal.Deadline,
-            CurrentAmount = updatedGoal.CurrentAmount
-        });
-        return await ReadEntity(entityId);
+        var affectedRows = await connection.ExecuteAsync(sql, entity);
+        return affectedRows > 0;
     }
 }

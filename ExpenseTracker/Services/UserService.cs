@@ -27,7 +27,7 @@ public class UserService : IUserService
 
     public async Task<User?> UpdateUser(Guid userId, UpdateDto updateDto)
     {
-        var existingUser = await GetUserById(userId);
+        var existingUser = await _userRepository.ReadEntity(userId);
 
         if (existingUser == null)
         {
@@ -37,7 +37,14 @@ public class UserService : IUserService
         {
             throw new ArgumentException("Invalid email format.");
         }
-        return await _userRepository.UpdateEntity(userId, updateDto);
+        var updatedUser = updateDto.GetEntity(existingUser); 
+        var result = await _userRepository.UpdateEntity(userId,updatedUser);
+
+        if (!result)
+        {
+            throw new Exception("Failed to update user");
+        }
+        return updatedUser;
     }
 
     public async Task<User?> DeleteUser(Guid userId)

@@ -32,15 +32,15 @@ public class BudgetRepository : IBudgetRepository
         return entityModel;
     }
 
-    public async Task<Budget?> UpdateEntity(Guid entityId, IDto<Budget> entityDto)
+    public async Task<bool> UpdateEntity(Guid entityId, Budget entity)
     {
         var sql = @"UPDATE Budget 
                         SET BudgetAmount = @BudgetAmount 
                         WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
 
-        await connection.ExecuteAsync(sql, new { Id = entityId, BudgetAmount = entityDto.GetEntity(null).BudgetAmount });
-        return await ReadEntity(entityId);
+        var affectedRows = await connection.ExecuteAsync(sql, entity);
+        return affectedRows > 0;
     }
 
     public async Task<Budget> GetMonthlyBudget(Guid userId, DateTime month)

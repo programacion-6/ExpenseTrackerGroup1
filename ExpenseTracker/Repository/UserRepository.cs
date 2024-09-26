@@ -28,16 +28,16 @@ public class UserRepository : IUserRepository
         return (await connection.QueryAsync<User>(sql)).AsList();
     }
 
-    public async Task<User?> UpdateEntity(Guid entityId, IDto<User> entityDto)
+    public async Task<bool> UpdateEntity(Guid entityId, User entity)
     {
         var sql = @"UPDATE Users
-                    SET Name = @Name, Email = @Email 
+                    SET Name = @Name,
+                        Email = @Email,
+                        PasswordHash = @PasswordHash
                     WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-        
-        var updatedUser = entityDto.GetEntity(new User { Id = entityId });
-        await connection.ExecuteAsync(sql, new { Id = entityId, updatedUser.Name, updatedUser.Email });
-        return updatedUser;
+        var affectedRows = await connection.ExecuteAsync(sql, entity);
+        return affectedRows > 0;
     }
 
     public async Task<User?> DeleteEntity(Guid entityId)

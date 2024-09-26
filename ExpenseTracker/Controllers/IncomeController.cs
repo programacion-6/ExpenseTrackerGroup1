@@ -44,7 +44,7 @@ public class IncomeController : ControllerBase
         if (updateIncomeDto == null)
             return BadRequest("Invalid income data.");
 
-        var updatedIncome = await _incomeRepository.UpdateEntity(id, updateIncomeDto);
+        var updatedIncome = await _incomeRepository.UpdateEntity(id, updateIncomeDto.GetEntity(null));
         if (updatedIncome == null)
             return NotFound();
 
