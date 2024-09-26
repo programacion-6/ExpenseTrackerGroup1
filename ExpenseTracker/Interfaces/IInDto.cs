@@ -1,6 +1,6 @@
 namespace ExpenseTracker.Interfaces;
 
-public interface IDto<T>
+public interface IInDto<T>
 {
     T GetEntity(T? entity);
 }

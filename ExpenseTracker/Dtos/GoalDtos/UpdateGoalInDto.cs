@@ -2,7 +2,7 @@ using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.GoalDtos;
 
-public class UpdateGoalDto : IDto<Goal>
+public class UpdateGoalInDto : IInDto<Goal>
 {
     public decimal GoalAmount { get; set; }
     public DateTime Deadline { get; set; }

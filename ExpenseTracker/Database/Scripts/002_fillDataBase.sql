@@ -10,17 +10,18 @@ INSERT INTO Users (Id, Name, Email, PasswordHash, CreatedAt) VALUES
     (gen_random_uuid(), 'Paula Perez', 'paula.perez@example.com', 'hashedpassword9', CURRENT_TIMESTAMP),
     (gen_random_uuid(), 'Miguel Castillo', 'miguel.castillo@example.com', 'hashedpassword10', CURRENT_TIMESTAMP);
 
-INSERT INTO Budget (Id, UserId, BudgetAmount, Month) VALUES
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 1000.00, '2024-09'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Jane Smith'), 1500.50, '2024-09'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Carlos García'), 2000.00, '2024-09'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Ana Martinez'), 1200.75, '2024-08'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Sara Lopez'), 800.00, '2024-09'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Luis Rodríguez'), 2500.00, '2024-09'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Maria Torres'), 1750.50, '2024-07'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'David Alvarez'), 950.25, '2024-08'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Paula Perez'), 1100.00, '2024-06'),
-    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Miguel Castillo'), 3000.00, '2024-09');
+INSERT INTO Budget (Id, UserId, BudgetAmount, Month, CreatedAt) VALUES
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 1000.00, '2024-09-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Jane Smith'), 1500.50, '2024-09-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Carlos García'), 2000.00, '2024-09-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Ana Martinez'), 1200.75, '2024-08-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Sara Lopez'), 800.00, '2024-09-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Luis Rodríguez'), 2500.00, '2024-09-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Maria Torres'), 1750.50, '2024-07-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'David Alvarez'), 950.25, '2024-08-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Paula Perez'), 1100.00, '2024-06-01', CURRENT_TIMESTAMP),
+    (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'Miguel Castillo'), 3000.00, '2024-09-01', CURRENT_TIMESTAMP);
+
 
 INSERT INTO Expense (Id, UserId, Amount, Description, Category, Date, CreatedAt) VALUES
     (gen_random_uuid(), (SELECT Id FROM Users WHERE Name = 'John Doe'), 200.00, 'Groceries', 'Food', '2024-09-12', CURRENT_TIMESTAMP),

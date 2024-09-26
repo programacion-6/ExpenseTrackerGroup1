@@ -27,7 +27,6 @@ public class BudgetRepository : IBudgetRepository
         var sql = @"INSERT INTO Budget (Id, UserId, BudgetAmount, Month) 
                         VALUES (@Id, @UserId, @BudgetAmount, @Month)";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
         await connection.ExecuteAsync(sql, entityModel);
         return entityModel;
     }
@@ -38,26 +37,26 @@ public class BudgetRepository : IBudgetRepository
                         SET BudgetAmount = @BudgetAmount 
                         WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
         var affectedRows = await connection.ExecuteAsync(sql, entity);
         return affectedRows > 0;
     }
 
-    public async Task<Budget> GetMonthlyBudget(Guid userId, DateTime month)
+    public async Task<Budget?> GetMonthlyBudget(Guid userId, DateTime month)
     {
         var sql = @"SELECT * FROM Budget 
-                        WHERE UserId = @UserId AND Month = @Month";
+                WHERE UserId = @UserId AND Month = @Month";
         using var connection = await _dbConnection.CreateConnectionAsync();
-        var budget = await connection.QueryFirstOrDefaultAsync<Budget>(sql, new { UserId = userId, Month = month.ToString("yyyy-MM") });
-        return budget ?? throw new KeyNotFoundException("Budget not found for the given month.");
+        var firstDayOfMonth = new DateTime(month.Year, month.Month, 1);
+        return await connection.QueryFirstOrDefaultAsync<Budget>(sql, new { UserId = userId, Month = firstDayOfMonth });
+    }
+    
+    public async Task<Budget?> GetCurrentMonthBudget(Guid userId)
+    {
+        var sql = @"SELECT * FROM Budget 
+                WHERE UserId = @UserId AND Month = @Month";
+        using var connection = await _dbConnection.CreateConnectionAsync();
+        var currentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        return await connection.QueryFirstOrDefaultAsync<Budget>(sql, new { UserId = userId, Month = currentMonth });
     }
 
-    public async Task<Budget> GetRemainingBudget(Guid userId)
-    {
-        var sql = @"SELECT * FROM Budget 
-                        WHERE UserId = @UserId 
-                        ORDER BY Month DESC LIMIT 1";
-        using var connection = await _dbConnection.CreateConnectionAsync();
-        return await connection.QueryFirstOrDefaultAsync<Budget>(sql, new { UserId = userId });
-    }
 }

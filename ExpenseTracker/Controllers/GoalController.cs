@@ -17,17 +17,17 @@ public class GoalController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateGoal([FromBody] CreateGoalDto createGoalDto, [FromQuery] Guid userId)
+    public async Task<IActionResult> CreateGoal([FromBody] CreateGoalInDto createGoalInDto, [FromQuery] Guid userId)
     {
-        if (createGoalDto == null)
+        if (createGoalInDto == null)
             return BadRequest("Goal data is required.");
 
         var goal = new Goal
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            GoalAmount = createGoalDto.GoalAmount,
-            Deadline = createGoalDto.Deadline,
+            GoalAmount = createGoalInDto.GoalAmount,
+            Deadline = createGoalInDto.Deadline,
             CurrentAmount = 0
         };
 
@@ -53,12 +53,12 @@ public class GoalController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateGoal(Guid id, [FromBody] UpdateGoalDto updateGoalDto)
+    public async Task<IActionResult> UpdateGoal(Guid id, [FromBody] UpdateGoalInDto updateGoalInDto)
     {
-        if (updateGoalDto == null)
+        if (updateGoalInDto == null)
             return BadRequest("Goal data is required.");
 
-        var updatedGoal = await _goalRepository.UpdateEntity(id, updateGoalDto.GetEntity(null));
+        var updatedGoal = await _goalRepository.UpdateEntity(id, updateGoalInDto.GetEntity(null));
         if (updatedGoal == null)
             return NotFound("Goal not found.");
 

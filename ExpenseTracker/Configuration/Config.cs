@@ -6,6 +6,7 @@ using ExpenseTracker.Persistence;
 using ExpenseTracker.Persistence.Database.Infrastructure;
 using ExpenseTracker.Persistence.Database.Interface;
 using ExpenseTracker.Repository;
+using ExpenseTracker.Service;
 using ExpenseTracker.Services;
 using Npgsql;
 
@@ -41,6 +42,7 @@ public static class Config
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IBudgetService, BudgetService>();
         return services;
     }
 }
