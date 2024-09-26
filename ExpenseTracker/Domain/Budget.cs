@@ -7,6 +7,8 @@ public class Budget : IEntity
     public decimal BudgetAmount { get; set; }
     public string Month { get; set; }
 
+    public Budget() { }
+
     public Budget(Guid id, Guid userId, decimal budgetAmount, string month)
     {
         Id = id;
