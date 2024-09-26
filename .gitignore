@@ -34,10 +34,6 @@ out/
 *~
 *.bak
 
-# Config files
-appsettings.Development.json
-appsettings.Production.json
-
 # Secrets
 secrets.json
 

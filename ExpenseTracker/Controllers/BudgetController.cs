@@ -79,15 +79,21 @@ public class BudgetController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] IDto<Budget> updateBudgetDto)
+    public async Task<IActionResult> UpdateBudget(Guid id, [FromBody] UpdateBudgetDto updateBudgetDto)
     {
         if (updateBudgetDto == null)
             return BadRequest("Budget data is required.");
 
-        var updatedBudget = await _budgetRepository.UpdateEntity(id, updateBudgetDto);
-        if (updatedBudget == null)
-            return NotFound("Budget not found.");
-        
-        return Ok(updatedBudget);
+        if (updateBudgetDto is UpdateBudgetDto dto)
+        {
+            var updatedBudget = await _budgetRepository.UpdateEntity(id, dto);
+            if (updatedBudget == null)
+                return NotFound("Budget not found.");
+
+            return Ok(updatedBudget);
+        }
+
+        return BadRequest("Invalid DTO type provided.");
     }
+
 }

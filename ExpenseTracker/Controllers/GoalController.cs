@@ -9,15 +9,15 @@ namespace ExpenseTracker.Controllers;
 [Route("api/[controller]")]
 public class GoalController : ControllerBase
 {
-    private readonly GoalRepository _goalRepository;
+    private readonly IGoalRepository _goalRepository;
 
-    public GoalController(GoalRepository goalRepository)
+    public GoalController(IGoalRepository goalRepository)
     {
         _goalRepository = goalRepository;
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateGoal([FromBody] CreateGoalDto createGoalDto, [FromQuery] int userId)
+    public async Task<IActionResult> CreateGoal([FromBody] CreateGoalDto createGoalDto, [FromQuery] Guid userId)
     {
         if (createGoalDto == null)
             return BadRequest("Goal data is required.");
