@@ -19,6 +19,12 @@ public class UpdateExpenseDto : IDto<Expense>
 
     public Expense GetDto()
     {
-        return new Expense(Guid.NewGuid(), Amount, Description, Category, Date); 
+        return new Expense
+        { 
+            Amount = Amount,
+            Description = Description,
+            Category = Category,
+            Date = Date,
+        };
     }
 }
