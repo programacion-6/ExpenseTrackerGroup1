@@ -1,8 +1,9 @@
 using ExpenseTracker.Domain;
+using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.ExpenseDtos;
 
-public class CreateExpenseDto : IDto<Expense>
+public class CreateExpenseDto : IDto<CreateExpenseDto>
 {
     public decimal Amount { get; set; }
     public string Description { get; set; }
@@ -17,8 +18,8 @@ public class CreateExpenseDto : IDto<Expense>
         Date = date;
     }
 
-    public Expense GetDto()
+    public CreateExpenseDto GetEntity(CreateExpenseDto entity)
     {
-        return new Expense(Guid.NewGuid(), Amount, Description, Category, Date);
+        return this;
     }
 }

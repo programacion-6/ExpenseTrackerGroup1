@@ -1,30 +1,26 @@
 using ExpenseTracker.Domain;
+using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.ExpenseDtos;
 
 public class UpdateExpenseDto : IDto<Expense>
 {
-    public decimal Amount { get; set; }
-    public string Description { get; set; }
-    public string Category { get; set; }
-    public DateTime Date { get; set; }
+    public decimal? Amount { get; set; }
+    public string? Description { get; set; }
+    public string? Category { get; set; }
+    public DateTime? Date { get; set; }
 
-    public UpdateExpenseDto(decimal amount, string description, string category, DateTime date)
+    public Expense GetEntity(Expense? entity)
     {
-        Amount = amount;
-        Description = description;
-        Category = category;
-        Date = date;
-    }
-
-    public Expense GetDto()
-    {
+        ArgumentNullException.ThrowIfNull(entity);
         return new Expense
-        { 
-            Amount = Amount,
-            Description = Description,
-            Category = Category,
-            Date = Date,
+        {
+            Id = entity.Id,
+            Amount = Amount ?? entity.Amount,
+            Description = Description ?? entity.Description,
+            Category = Category ?? entity.Category,
+            Date = Date ?? entity.Date,
+            CreatedAt = entity.CreatedAt
         };
     }
 }

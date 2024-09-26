@@ -12,20 +12,13 @@ public class ExpenseDto
     public DateTime Date { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public ExpenseDto(Guid id, Guid userId, decimal amount, string description, string category, DateTime date, DateTime createdAt)
+    public ExpenseDto GetDto(Expense entity)
     {
-        Id = id;
-        UserId = userId;
-        Amount = amount;
-        Description = description;
-        Category = category;
-        Date = date;
-        CreatedAt = createdAt;
-    }
-
-    
-    public static ExpenseDto FromExpense(Expense expense)
-    {
-        return new ExpenseDto(expense.Id, expense.UserId, expense.Amount, expense.Description, expense.Category, expense.Date, expense.CreatedAt);
+        UserId = entity.UserId;
+        Amount = entity.Amount;
+        Description = entity.Description;
+        Category = entity.Category;
+        Date = entity.Date;
+        CreatedAt = entity.CreatedAt;
     }
 }

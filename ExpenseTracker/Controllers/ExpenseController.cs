@@ -19,16 +19,23 @@ namespace ExpenseTracker.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createExpenseDto)
+        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createExpenseDto, [FromQuery] Guid userId)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (createExpenseDto == null)
+                return BadRequest("Expense data is required.");
 
-            var expense = createExpenseDto.GetDto();
+            var expense = new Expense
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Amount = createExpenseDto.Amount, 
+                Description = createExpenseDto.Description,
+                Category = createExpenseDto.Category,
+                Date = createExpenseDto.Date,
+                CreatedAt = DateTime.UtcNow
+            };
+
             var createdExpense = await _expenseRepository.CreateEntity(expense);
-            
             return CreatedAtAction(nameof(GetExpense), new { id = createdExpense.Id }, createdExpense);
         }
 
@@ -47,7 +54,7 @@ namespace ExpenseTracker.Controllers
             var expense = await _expenseRepository.ReadEntity(id);
             if (expense == null)
             {
-                return NotFound();
+                return NotFound("Expense not found");
             }
 
             return Ok(expense); 
@@ -57,16 +64,12 @@ namespace ExpenseTracker.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateExpense(Guid id, [FromBody] UpdateExpenseDto updateExpenseDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            if (updateExpenseDto == null)
+                return BadRequest("Expense data is required.");
 
-            var updatedExpense = await _expenseRepository.UpdateEntity(id, updateExpenseDto);
+            var updatedExpense = await _expenseRepository.UpdateEntity(id, updateExpenseDto.GetEntity(null));
             if (updatedExpense == null)
-            {
-                return NotFound();
-            }
+                return NotFound("Expense not found");
 
             return Ok(updatedExpense); 
         }
@@ -78,7 +81,7 @@ namespace ExpenseTracker.Controllers
             var deletedExpense = await _expenseRepository.DeleteEntity(id);
             if (deletedExpense == null)
             {
-                return NotFound();
+                return NotFound("Expense not found");
             }
 
             return NoContent(); 

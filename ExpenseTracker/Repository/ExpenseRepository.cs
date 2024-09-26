@@ -29,16 +29,15 @@ public class ExpenseRepository : IExpenseRepository
     {
         var sql = "DELETE FROM Expenses WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-        var result = await connection.ExecuteAsync(sql, new { Id = entityId });
-        return result > 0 ? new Expense() : null; 
+        await connection.ExecuteAsync(sql, new { Id = entityId });
+        return null; 
     }
 
     public async Task<List<Expense>> GetAllEntities()
     {
         var sql = "SELECT * FROM Expenses";
         using var connection = await _dbConnection.CreateConnectionAsync();
-        var expenses = await connection.QueryAsync<Expense>(sql);
-        return expenses.ToList();
+        return (await connection.QueryAsync<Expense>(sql)).AsList();
     }
 
     public async Task<Expense?> ReadEntity(Guid entityId)
@@ -49,29 +48,18 @@ public class ExpenseRepository : IExpenseRepository
         return expense;
     }
 
-    public async Task<Expense?> UpdateEntity(Guid entityId, IDto<Expense> entityDto)
+    public async Task<bool> UpdateEntity(Guid entityId, Expense entity)
     {
-        var sqlSelect = "SELECT * FROM Expenses WHERE Id = @Id";
+        var sql = @"UPDATE Expenses
+                    SET Amount = @Name,
+                        Description = @Description,
+                        Category = @PasswordHash
+                        Date = #Date
+                    WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-
-    
-        var existingExpense = await connection.QuerySingleOrDefaultAsync<Expense>(sqlSelect, new { Id = entityId });
-        if (existingExpense == null)
-        {
-            return null; 
-        }
-
-    
-        var updatedExpense = entityDto.GetDto();
-        existingExpense.UpdateDetails(updatedExpense.Amount, updatedExpense.Category, updatedExpense.Description);
-        existingExpense.Date = updatedExpense.Date;
-
-    
-        var sqlUpdate = @"UPDATE Expenses 
-                        SET Amount = @Amount, Description = @Description, Category = @Category, Date = @Date 
-                        WHERE Id = @Id";
-    
-        var result = await connection.ExecuteAsync(sqlUpdate, existingExpense);
-        return result > 0 ? existingExpense : null;
+        var affectedRows = await connection.ExecuteAsync(sql, entity);
+        return affectedRows > 0;
     }
+
+    
 }
