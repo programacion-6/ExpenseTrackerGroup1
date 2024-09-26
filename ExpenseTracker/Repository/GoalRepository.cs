@@ -48,7 +48,7 @@ public class GoalRepository : IGoalRepository
         {
             return null; 
         }
-        var updatedGoal = entityDto.GetDto();
+        var updatedGoal = entityDto.GetEntity(new Goal{Id = entityId});
         var sql = @"UPDATE Goal 
                         SET GoalAmount = @GoalAmount, 
                             Deadline = @Deadline, 

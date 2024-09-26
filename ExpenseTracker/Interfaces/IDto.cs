@@ -1,4 +1,6 @@
+namespace ExpenseTracker.Interfaces;
+
 public interface IDto<T>
 {
-    T GetDto();
+    T GetEntity(T? entity);
 }

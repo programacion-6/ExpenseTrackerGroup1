@@ -39,7 +39,7 @@ public class BudgetRepository : IBudgetRepository
                         WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
 
-        await connection.ExecuteAsync(sql, new { Id = entityId, BudgetAmount = entityDto.GetDto().BudgetAmount });
+        await connection.ExecuteAsync(sql, new { Id = entityId, BudgetAmount = entityDto.GetEntity(null).BudgetAmount });
         return await ReadEntity(entityId);
     }
 
