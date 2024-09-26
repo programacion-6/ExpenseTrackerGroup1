@@ -25,7 +25,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<User?> UpdateUser(Guid userId, UpdateDto updateDto)
+    public async Task<User?> UpdateUser(Guid userId, UserUpdateDto userUpdateDto)
     {
         var existingUser = await _userRepository.ReadEntity(userId);
 
@@ -33,11 +33,11 @@ public class UserService : IUserService
         {
             throw new KeyNotFoundException($"User with ID {userId} not found.");
         }
-        if (!EmailValidator.IsValidEmail(updateDto.GetEntity(existingUser).Email))
+        if (!EmailValidator.IsValidEmail(userUpdateDto.GetEntity(existingUser).Email))
         {
             throw new ArgumentException("Invalid email format.");
         }
-        var updatedUser = updateDto.GetEntity(existingUser); 
+        var updatedUser = userUpdateDto.GetEntity(existingUser); 
         var result = await _userRepository.UpdateEntity(userId,updatedUser);
 
         if (!result)

@@ -3,7 +3,7 @@ using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.UserDtos;
 
-public class UpdateDto : IDto<User>
+public class UserUpdateDto : IDto<User>
 {
     public string? Name { get; set; }
     public string? Email { get; set; }
