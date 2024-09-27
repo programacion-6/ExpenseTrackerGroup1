@@ -1,8 +1,9 @@
 using ExpenseTracker.Domain;
+using ExpenseTracker.Interfaces.Service;
 
 namespace ExpenseTracker.Dtos.ExpenseDtos;
 
-public class ExpenseDto
+public class ExpenseDto : IOutDto<ExpenseDto, Expense>
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
@@ -14,11 +15,14 @@ public class ExpenseDto
 
     public ExpenseDto GetDto(Expense entity)
     {
-        UserId = entity.UserId;
-        Amount = entity.Amount;
-        Description = entity.Description;
-        Category = entity.Category;
-        Date = entity.Date;
-        CreatedAt = entity.CreatedAt;
+        return new ExpenseDto
+        {
+            UserId = entity.UserId,
+            Amount = entity.Amount,
+            Description = entity.Description,
+            Category = entity.Category,
+            Date = entity.Date,
+            CreatedAt = entity.CreatedAt,
+        };
     }
 }

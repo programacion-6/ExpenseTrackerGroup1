@@ -3,7 +3,7 @@ using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.ExpenseDtos;
 
-public class UpdateExpenseDto : IDto<Expense>
+public class UpdateExpenseDto : IInDto<Expense>
 {
     public decimal? Amount { get; set; }
     public string? Description { get; set; }
@@ -12,7 +12,7 @@ public class UpdateExpenseDto : IDto<Expense>
 
     public Expense GetEntity(Expense? entity)
     {
-        ArgumentNullException.ThrowIfNull(entity);
+        if (entity == null) throw new ArgumentNullException(nameof(entity));
         return new Expense
         {
             Id = entity.Id,

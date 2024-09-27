@@ -16,37 +16,60 @@ public class ExpenseService : IExpenseService
          _expenseRepository = expenseRepository;
     }
 
-    public async Task<Expense?> CreateExpense(Expense expense)
+    public async Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto)
     {
-        throw new NotImplementedException();
+        if (expenseDto == null)
+            throw new ArgumentNullException(nameof(expenseDto));
+        var expense = expenseDto.GetEntity(null);
+        var createdExpense = await _expenseRepository.CreateEntity(expense);
+        return new ExpenseDto().GetDto(createdExpense);
     }
 
-    public async Task<Expense?> DeleteExpense(Guid expenseId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<List<Expense>> GetAllExpenses()
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<ExpenseDto?> GetExpenseById(Guid expenseId)
+    public  async Task<Expense?> DeleteExpenseAsync(Guid expenseId)
     {
         if (expenseId == Guid.Empty)
-                throw new ArgumentException("Expense ID cannot be empty.");
-
-        var expense = await _expenseRepository.ReadEntity(expenseId);
-        if(expense == null)
-        {
-            throw new KeyNotFoundException($"Expense with ID {expenseId} not found.");
-        }
+            throw new ArgumentException("Expense ID cannot be empty.", nameof(expenseId));
         
-        return new ExpenseDto.GetDto(expense);
+        var existingExpense = await _expenseRepository.ReadEntity(expenseId);
+
+        if (existingExpense == null)
+            throw new KeyNotFoundException($"Expense with ID {expenseId} not found.");
+
+       
+        return await _expenseRepository.DeleteEntity(expenseId);
     }
 
-    public Task<Expense?> UpdateExpense(Guid expenseId, UpdateExpenseDto expenseUpdateDto)
+    public  async Task<List<Expense>> GetAllExpensesAsync()
     {
-        throw new NotImplementedException();
+        return await _expenseRepository.GetAllEntities(); 
+    }
+
+    public async Task<ExpenseDto?> GetExpenseByIdAsync(Guid expenseId)
+    {
+        if (expenseId == Guid.Empty)
+            throw new ArgumentException("Expense ID cannot be empty.", nameof(expenseId));
+        
+        var expense = await _expenseRepository.ReadEntity(expenseId);
+        if (expense == null)
+            throw new KeyNotFoundException($"Expense with ID {expenseId} not found.");
+
+        return new ExpenseDto().GetDto(expense);
+    }
+
+    public async Task<bool> UpdateExpenseAsync(Guid expenseId, UpdateExpenseDto expenseDto)
+    {   
+        if (expenseId == Guid.Empty)
+                throw new ArgumentException("Goal ID cannot be empty.");
+        
+        if (expenseDto == null)
+                throw new ArgumentNullException(nameof(expenseDto));
+        
+        var existingExpense = await _expenseRepository.ReadEntity(expenseId);
+        
+        if (existingExpense == null)
+            throw new ArgumentException("Expense does not exist.", nameof(expenseId));
+
+        var updatedExpense = expenseDto.GetEntity(existingExpense);
+        return await _expenseRepository.UpdateEntity(expenseId, updatedExpense);
     }
 }

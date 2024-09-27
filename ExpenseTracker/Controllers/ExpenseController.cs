@@ -3,6 +3,7 @@ using ExpenseTracker.Repository;
 using ExpenseTracker.Dtos.ExpenseDtos;
 using ExpenseTracker.Domain;
 using ExpenseTracker.Interfaces;
+using ExpenseTracker.Interfaces.Service;
 
 namespace ExpenseTracker.Controllers
 {
@@ -10,81 +11,111 @@ namespace ExpenseTracker.Controllers
     [Route("api/[controller]")]
     public class ExpenseController : ControllerBase
     {
-        private readonly IExpenseRepository _expenseRepository;
+        private readonly IExpenseService _expenseService;
 
-        public ExpenseController(IExpenseRepository expenseRepository)
+        public ExpenseController(IExpenseService expenseService)
         {
-            _expenseRepository = expenseRepository;
+            _expenseService = expenseService;
         }
 
         
         [HttpPost]
-        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createExpenseDto, [FromQuery] Guid userId)
+        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createdExpenseDto, [FromQuery] Guid userId)
         {
-            if (createExpenseDto == null)
+            if (createdExpenseDto == null)
                 return BadRequest("Expense data is required.");
 
-            var expense = new Expense
+            try
             {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Amount = createExpenseDto.Amount, 
-                Description = createExpenseDto.Description,
-                Category = createExpenseDto.Category,
-                Date = createExpenseDto.Date,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var createdExpense = await _expenseRepository.CreateEntity(expense);
-            return CreatedAtAction(nameof(GetExpense), new { id = createdExpense.Id }, createdExpense);
+                var expenseDto = await _expenseService.CreateExpenseAsync(createdExpenseDto);
+                return CreatedAtAction(nameof(GetExpense), new { id = expenseDto.Id }, expenseDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         
         [HttpGet]
         public async Task<IActionResult> GetAllExpenses()
         {
-            var expenses = await _expenseRepository.GetAllEntities();
-            return Ok(expenses); 
+            try
+            {
+                var expenses = await _expenseService.GetAllExpensesAsync();
+                return Ok(expenses);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         
         [HttpGet("{id}")]
         public async Task<IActionResult> GetExpense(Guid id)
         {
-            var expense = await _expenseRepository.ReadEntity(id);
-            if (expense == null)
-            {
-                return NotFound("Expense not found");
-            }
+            if (id == Guid.Empty)
+                return BadRequest("Expense ID cannot be empty.");
+            
 
-            return Ok(expense); 
+           try
+            {
+                var expenseDto = await _expenseService.GetExpenseByIdAsync(id);
+                if (expenseDto == null)
+                    return NotFound($"Expense with ID {id} not found.");
+
+                return Ok(expenseDto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateExpense(Guid id, [FromBody] UpdateExpenseDto updateExpenseDto)
         {
+            if (id == Guid.Empty)
+                return BadRequest("Expense ID cannot be empty.");
+
             if (updateExpenseDto == null)
                 return BadRequest("Expense data is required.");
 
-            var updatedExpense = await _expenseRepository.UpdateEntity(id, updateExpenseDto.GetEntity(null));
-            if (updatedExpense == null)
-                return NotFound("Expense not found");
+            try
+            {
+                var result = await _expenseService.UpdateExpenseAsync(id, updateExpenseDto);
+                if (!result)
+                    return NotFound($"Expense with ID {id} not found or update failed.");
 
-            return Ok(updatedExpense); 
+                return Ok("Expense updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExpense(Guid id)
         {
-            var deletedExpense = await _expenseRepository.DeleteEntity(id);
-            if (deletedExpense == null)
-            {
-                return NotFound("Expense not found");
-            }
+            if (id == Guid.Empty)
+                return BadRequest("Expense ID cannot be empty.");
 
-            return NoContent(); 
+            try
+            {
+                var deletedExpense = await _expenseService.DeleteExpenseAsync(id);
+                if (deletedExpense == null)
+                    return NotFound($"Expense with ID {id} not found.");
+
+                return Ok("Expense deleted successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -3,23 +3,24 @@ using ExpenseTracker.Interfaces;
 
 namespace ExpenseTracker.Dtos.ExpenseDtos;
 
-public class CreateExpenseDto : IDto<CreateExpenseDto>
+public class CreateExpenseDto : IInDto<Expense>
 {
+    public Guid UserId { get; set; }
     public decimal Amount { get; set; }
     public string Description { get; set; }
     public string Category { get; set; }
     public DateTime Date { get; set; }
 
-    public CreateExpenseDto(decimal amount, string description, string category, DateTime date)
+    public Expense GetEntity(Expense? entity)
     {
-        Amount = amount;
-        Description = description;
-        Category = category;
-        Date = date;
-    }
-
-    public CreateExpenseDto GetEntity(CreateExpenseDto entity)
-    {
-        return this;
+        return new Expense
+        {
+            Id = Guid.NewGuid(),
+            UserId = UserId, 
+            Amount = Amount,
+            Description = Description,
+            Category = Category,
+            Date = Date,
+        };
     }
 }
