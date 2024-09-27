@@ -18,7 +18,7 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<Expense> CreateEntity(Expense entityModel)
     {
-        var sql = @"INSERT INTO Expenses (Id, UserId, Amount, Description, Category, Date, CreatedAt) 
+        var sql = @"INSERT INTO Expense (Id, UserId, Amount, Description, Category, Date, CreatedAt) 
                        VALUES (@Id, @UserId, @Amount, @Description, @Category, @Date, @CreatedAt)";
         using var connection = await _dbConnection.CreateConnectionAsync();
         await connection.ExecuteAsync(sql, entityModel);
@@ -27,22 +27,22 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<Expense?> DeleteEntity(Guid entityId)
     {
-        var sql = "DELETE FROM Expenses WHERE Id = @Id";
+        var sql = "DELETE FROM Expense WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
-        await connection.ExecuteAsync(sql, new { Id = entityId });
+        var rowsAffected = await connection.ExecuteAsync(sql, new { Id = entityId });
         return null; 
     }
 
     public async Task<List<Expense>> GetAllEntities()
     {
-        var sql = "SELECT * FROM Expenses";
+        var sql = "SELECT * FROM Expense";
         using var connection = await _dbConnection.CreateConnectionAsync();
         return (await connection.QueryAsync<Expense>(sql)).AsList();
     }
 
     public async Task<Expense?> ReadEntity(Guid entityId)
     {
-        var sql = "SELECT * FROM Expenses WHERE Id = @Id";
+        var sql = "SELECT * FROM Expense WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
         var expense = await connection.QueryFirstOrDefaultAsync<Expense>(sql, new { Id = entityId });
         return expense;
@@ -50,11 +50,11 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<bool> UpdateEntity(Guid entityId, Expense entity)
     {
-        var sql = @"UPDATE Expenses
-                    SET Amount = @Name,
+        var sql = @"UPDATE Expense
+                    SET Amount = @Amount,
                         Description = @Description,
-                        Category = @PasswordHash
-                        Date = #Date
+                        Category = @Category,
+                        Date = @Date
                     WHERE Id = @Id";
         using var connection = await _dbConnection.CreateConnectionAsync();
         var affectedRows = await connection.ExecuteAsync(sql, entity);

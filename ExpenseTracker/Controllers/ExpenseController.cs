@@ -20,7 +20,7 @@ namespace ExpenseTracker.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createdExpenseDto, [FromQuery] Guid userId)
+        public async Task<IActionResult> CreateExpense([FromBody] CreateExpenseDto createdExpenseDto)
         {
             if (createdExpenseDto == null)
                 return BadRequest("Expense data is required.");
@@ -62,9 +62,7 @@ namespace ExpenseTracker.Controllers
            try
             {
                 var expenseDto = await _expenseService.GetExpenseByIdAsync(id);
-                if (expenseDto == null)
-                    return NotFound($"Expense with ID {id} not found.");
-
+                if (expenseDto == null) return BadRequest("Expese not found");
                 return Ok(expenseDto);
             }
             catch (ArgumentException ex)
@@ -107,9 +105,6 @@ namespace ExpenseTracker.Controllers
             try
             {
                 var deletedExpense = await _expenseService.DeleteExpenseAsync(id);
-                if (deletedExpense == null)
-                    return NotFound($"Expense with ID {id} not found.");
-
                 return Ok("Expense deleted successfully.");
             }
             catch (ArgumentException ex)

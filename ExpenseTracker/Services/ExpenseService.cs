@@ -11,18 +11,27 @@ public class ExpenseService : IExpenseService
 {
     private readonly IExpenseRepository _expenseRepository;
 
-    public ExpenseService(IExpenseRepository expenseRepository)
+    private readonly IUserRepository _userRepository;
+
+
+    public ExpenseService(IExpenseRepository expenseRepository, IUserRepository userRepository)
     {
          _expenseRepository = expenseRepository;
+         _userRepository = userRepository;
     }
 
-    public async Task<ExpenseDto> CreateExpenseAsync(CreateExpenseDto expenseDto)
+    public async Task<Expense> CreateExpenseAsync(CreateExpenseDto expenseDto)
     {
         if (expenseDto == null)
             throw new ArgumentNullException(nameof(expenseDto));
+        
+        var user = await _userRepository.ReadEntity(expenseDto.UserId);
+        if (user == null)
+                throw new ArgumentException("User does not exist.");
+
         var expense = expenseDto.GetEntity(null);
         var createdExpense = await _expenseRepository.CreateEntity(expense);
-        return new ExpenseDto().GetDto(createdExpense);
+        return createdExpense;
     }
 
     public  async Task<Expense?> DeleteExpenseAsync(Guid expenseId)

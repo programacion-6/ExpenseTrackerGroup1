@@ -5,7 +5,6 @@ namespace ExpenseTracker.Dtos.ExpenseDtos;
 
 public class ExpenseDto : IOutDto<ExpenseDto, Expense>
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public decimal Amount { get; set; }
     public string Description { get; set; }
