@@ -4,60 +4,97 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExpenseTracker.Dtos.IncomeDtos;
 using ExpenseTracker.Interfaces;
+using ExpenseTracker.Interfaces.Service;
 
 [ApiController]
 [Route("api/[controller]")]
 public class IncomeController : ControllerBase
 {
-    private readonly IIncomeRepository _incomeRepository;
+    private readonly IIncomeService _incomeService;
 
-    public IncomeController(IIncomeRepository incomeRepository)
+    public IncomeController(IIncomeService incomeService)
     {
-        _incomeRepository = incomeRepository;
+        _incomeService = incomeService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] IncomeDto incomeDto)
+    public async Task<IActionResult> Create([FromBody] CreateIncomeDto incomeDto)
     {
         if (incomeDto == null)
-            return BadRequest("Invalid income data.");
+            return BadRequest("Income data is required.");
 
-        var income = new Income(Guid.NewGuid(), incomeDto.Amount, incomeDto.Source, incomeDto.Date);
-        var createdIncome = await _incomeRepository.CreateEntity(income);
-        
-        return CreatedAtAction(nameof(Read), new { id = createdIncome.Id }, createdIncome);
+        try
+        {
+            var createdIncome = await _incomeService.CreateIncomeAsync(incomeDto);
+
+            return CreatedAtAction(nameof(Read), new { id = createdIncome.UserId }, createdIncome);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Read(Guid id)
     {
-        var income = await _incomeRepository.ReadEntity(id);
-        if (income == null)
-            return NotFound();
+        if (id == Guid.Empty)
+            return BadRequest("Income ID cannot be empty.");
 
-        return Ok(income);
+        try
+        {
+            var income = await _incomeService.GetIncomeByIdAsync(id);
+            if (income == null)
+                return NotFound($"Income with ID {id} not found.");
+
+            return Ok(income);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] IInDto<Income> updateIncomeInDto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateIncomeInDto updateIncomeDto)
     {
-        if (updateIncomeInDto == null)
-            return BadRequest("Invalid income data.");
+        if (id == Guid.Empty)
+            return BadRequest("Income ID cannot be empty.");
 
-        var updatedIncome = await _incomeRepository.UpdateEntity(id, updateIncomeInDto.GetEntity(null));
-        if (updatedIncome == null)
-            return NotFound();
+        if (updateIncomeDto == null)
+            return BadRequest("Income data is required.");
 
-        return Ok(updatedIncome);
+        try
+        {
+            var result = await _incomeService.UpdateIncomeAsync(id, updateIncomeDto);
+            if (!result)
+                return NotFound($"Income with ID {id} not found or update failed.");
+
+            return Ok("Income updated successfully.");
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var deletedIncome = await _incomeRepository.DeleteEntity(id);
-        if (deletedIncome == null)
-            return NotFound();
+        if (id == Guid.Empty)
+            return BadRequest("Income ID cannot be empty.");
 
-        return NoContent();
+        try
+        {
+            var deletedIncome = await _incomeService.DeleteIncomeAsync(id);
+            if (!deletedIncome)
+                return NotFound($"Income with ID {id} not found.");
+
+            return Ok("Income deleted successfully.");
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
