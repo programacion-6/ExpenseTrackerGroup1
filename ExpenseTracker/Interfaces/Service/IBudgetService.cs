@@ -8,7 +8,7 @@ namespace ExpenseTracker.Interfaces.Service
         Task<Budget?> GetMonthlyBudget(Guid userId, DateTime month);
         Task<Budget?> GetCurrentMonthBudget(Guid userId);
         Task<Budget?> ReadEntity(Guid entityId);
-        Task<Budget> CreateEntity(CreateBudgetDto budgetDto);
+        Task<Budget> CreateEntity(Guid userId, CreateBudgetDto budgetDto);
         Task<bool> UpdateEntity(Guid entityId, UpdateBudgetDto budgetDto);
     }
 }

@@ -1,6 +1,7 @@
 using ExpenseTracker.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using ExpenseTracker.Dtos.UserDtos;
 
 namespace ExpenseTracker.Controllers
 {
@@ -16,11 +17,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(string name, string email, string password)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             try
             {
-                var token = await _authService.Register(name, email, password);
+                var token = await _authService.Register(registerDto.Name, registerDto.Email, registerDto.Password);
                 return Ok(new { Token = token });
             }
             catch (Exception ex)
@@ -30,11 +31,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             try
             {
-                var token = await _authService.Login(email, password);
+                var token = await _authService.Login(loginDto.Email, loginDto.Password);
                 return Ok(new { Token = token });
             }
             catch (Exception ex)

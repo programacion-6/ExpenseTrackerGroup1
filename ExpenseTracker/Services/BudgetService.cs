@@ -51,19 +51,16 @@ namespace ExpenseTracker.Service
             return await _budgetRepository.ReadEntity(entityId);
         }
 
-        public async Task<Budget> CreateEntity(CreateBudgetDto budgetDto)
+        public async Task<Budget> CreateEntity(Guid userId, CreateBudgetDto budgetDto)
         {
             if (budgetDto.BudgetAmount <= 0)
                 throw new ArgumentException("Budget amount must be greater than zero.");
-            
-            if (budgetDto.Month > DateTime.Now)
-                throw new ArgumentException("Cannot create a budget for a future month.");
 
-            var user = await _userRepository.ReadEntity(budgetDto.UserId);
+            var user = await _userRepository.ReadEntity(userId);
             if (user == null)
                 throw new ArgumentException("User does not exist.");
 
-            return await _budgetRepository.CreateEntity(budgetDto.GetEntity(null));
+            return await _budgetRepository.CreateEntity(budgetDto.GetEntity(new Budget{UserId = user.Id}));
         }
 
         public async Task<bool> UpdateEntity(Guid entityId, UpdateBudgetDto budgetDto)

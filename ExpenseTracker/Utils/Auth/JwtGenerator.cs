@@ -20,17 +20,24 @@ namespace ExpenseTracker.Utils
         public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            if(_secretKey == null ) {
+                throw new Exception("No secret key found.");
+            }
             var key = Encoding.ASCII.GetBytes(_secretKey);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), 
-                    new Claim(ClaimTypes.Email, user.Email) 
-                }),
+                Subject = new ClaimsIdentity(
+                    [
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Email, user.Email)
+                    ]
+                ),
                 Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
