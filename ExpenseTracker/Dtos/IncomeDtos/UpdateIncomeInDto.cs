@@ -15,6 +15,7 @@ public class UpdateIncomeInDto : IInDto<Income>
         return new Income()
         {
             Id = entity.Id,
+            UserId = entity.UserId,
             Amount = Amount ?? entity.Amount,
             Source = Source ?? entity.Source,
             Date = Date ?? entity.Date,

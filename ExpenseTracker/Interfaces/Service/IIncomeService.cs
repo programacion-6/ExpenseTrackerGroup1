@@ -7,7 +7,7 @@ namespace ExpenseTracker.Interfaces.Service
     {
         Task<IncomeDto?> GetIncomeByIdAsync(Guid id);
         Task<List<Income>> GetAllIncomesAsync();
-        Task<Income> CreateIncomeAsync(CreateIncomeDto incomeDto);
+        Task<Income> CreateIncomeAsync(Guid userId, CreateIncomeDto incomeDto);
         Task<bool> UpdateIncomeAsync(Guid id, UpdateIncomeInDto incomeDto);
         Task<Income?> DeleteIncomeAsync(Guid id);
         Task<IEnumerable<IncomeDto>> GetIncomesByUserIdAsync(Guid userId);

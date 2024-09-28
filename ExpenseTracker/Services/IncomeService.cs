@@ -15,16 +15,16 @@ namespace ExpenseTracker.Services
             _userRepository = userRepository;
         }
 
-        public async Task<Income> CreateIncomeAsync(CreateIncomeDto incomeDto)
+        public async Task<Income> CreateIncomeAsync(Guid userId, CreateIncomeDto incomeDto)
         {
             if (incomeDto == null)
                 throw new ArgumentNullException(nameof(incomeDto));
 
-            var user = await _userRepository.ReadEntity(incomeDto.UserId);
+            var user = await _userRepository.ReadEntity(userId);
             if (user == null)
                 throw new ArgumentException("User does not exist.");
 
-            var income = incomeDto.GetEntity(null);
+            var income = incomeDto.GetEntity(new Income{UserId = user.Id});
             var createdIncome = await _incomeRepository.CreateEntity(income);
 
             return createdIncome;

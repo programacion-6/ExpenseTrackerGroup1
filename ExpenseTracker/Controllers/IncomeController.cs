@@ -1,11 +1,14 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Dtos.IncomeDtos;
 using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class IncomeController : ControllerBase
     {
         private readonly IIncomeService _incomeService;
@@ -23,7 +26,8 @@ namespace ExpenseTracker.Controllers
 
             try
             {
-                var createdIncome = await _incomeService.CreateIncomeAsync(incomeDto);
+                var userId = GetCurrentUserId();
+                var createdIncome = await _incomeService.CreateIncomeAsync(userId, incomeDto);
                 return CreatedAtAction(nameof(GetIncome), new { id = createdIncome.Id }, createdIncome);
             }
             catch (ArgumentException ex)
@@ -104,14 +108,12 @@ namespace ExpenseTracker.Controllers
             }
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetIncomesByUserId(Guid userId)
+        [HttpGet("user")]
+        public async Task<IActionResult> GetIncomesByUserId()
         {
-            if (userId == Guid.Empty)
-                return BadRequest("User ID cannot be empty.");
-
             try
             {
+                var userId = GetCurrentUserId();
                 var incomes = await _incomeService.GetIncomesByUserIdAsync(userId);
                 return Ok(incomes);
             }
@@ -119,6 +121,12 @@ namespace ExpenseTracker.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
         }
     }
 }
