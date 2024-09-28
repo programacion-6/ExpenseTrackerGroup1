@@ -12,13 +12,12 @@ public class UpdateIncomeInDto : IInDto<Income>
     {
         if (entity == null) throw new ArgumentNullException(nameof(entity));
         
-        return new Income(
-            entity.UserId,
-            Amount ?? entity.Amount,
-            Source ?? entity.Source,
-            Date ?? entity.Date)
+        return new Income()
         {
             Id = entity.Id,
+            Amount = Amount ?? entity.Amount,
+            Source = Source ?? entity.Source,
+            Date = Date ?? entity.Date,
             CreatedAt = entity.CreatedAt
         };
     }

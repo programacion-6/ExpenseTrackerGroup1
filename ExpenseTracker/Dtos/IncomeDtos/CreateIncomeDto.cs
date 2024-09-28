@@ -11,10 +11,13 @@ public class CreateIncomeDto : IInDto<Income>
 
     public Income GetEntity(Income? entity)
     {
-        return new Income(UserId, Amount, Source, Date)
+        return new Income()
         {
             Id = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow
+            UserId = UserId,
+            Amount = Amount,
+            Source = Source,
+            Date = Date,
         };
     }
 }
