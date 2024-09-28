@@ -1,14 +1,17 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Repository;
 using ExpenseTracker.Dtos.ExpenseDtos;
 using ExpenseTracker.Domain;
 using ExpenseTracker.Interfaces;
 using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ExpenseController : ControllerBase
     {
         private readonly IExpenseService _expenseService;
@@ -27,7 +30,8 @@ namespace ExpenseTracker.Controllers
 
             try
             {
-                var expenseDto = await _expenseService.CreateExpenseAsync(createdExpenseDto);
+                var userId = GetCurrentUserId();
+                var expenseDto = await _expenseService.CreateExpenseAsync(userId, createdExpenseDto);
                 return CreatedAtAction(nameof(GetExpense), new { id = expenseDto.Id }, expenseDto);
             }
             catch (ArgumentException ex)
@@ -111,6 +115,12 @@ namespace ExpenseTracker.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
         }
     }
 }

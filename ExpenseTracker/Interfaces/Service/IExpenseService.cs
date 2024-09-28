@@ -8,7 +8,7 @@ public interface IExpenseService
 {
     Task<ExpenseDto?> GetExpenseByIdAsync(Guid expenseId);
     Task<List<Expense>> GetAllExpensesAsync();
-    Task<Expense> CreateExpenseAsync(CreateExpenseDto expenseDto);
+    Task<Expense> CreateExpenseAsync(Guid UserId, CreateExpenseDto expenseDto);
     Task<bool> UpdateExpenseAsync(Guid expenseId, UpdateExpenseDto expenseDto);
     Task<Expense?> DeleteExpenseAsync(Guid expenseId);
     
