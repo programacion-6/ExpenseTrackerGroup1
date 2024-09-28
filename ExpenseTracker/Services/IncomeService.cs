@@ -15,7 +15,7 @@ namespace ExpenseTracker.Services
             _userRepository = userRepository;
         }
 
-        public async Task<IncomeDto> CreateIncomeAsync(CreateIncomeDto incomeDto)
+        public async Task<Income> CreateIncomeAsync(CreateIncomeDto incomeDto)
         {
             if (incomeDto == null)
                 throw new ArgumentNullException(nameof(incomeDto));
@@ -27,7 +27,11 @@ namespace ExpenseTracker.Services
             var income = incomeDto.GetEntity(null);
             var createdIncome = await _incomeRepository.CreateEntity(income);
 
-            return new IncomeDto().GetDto(createdIncome);
+            return createdIncome;
+        }
+        public  async Task<List<Income>> GetAllIncomesAsync()
+        {
+            return await _incomeRepository.GetAllEntities(); 
         }
 
         public async Task<IncomeDto?> GetIncomeByIdAsync(Guid id)
@@ -45,11 +49,11 @@ namespace ExpenseTracker.Services
         public async Task<IEnumerable<IncomeDto>> GetIncomesByUserIdAsync(Guid userId)
         {
             if (userId == Guid.Empty)
-                throw new ArgumentException("User ID cannot be empty.");
+                throw new ArgumentException("User ID cannot be empty.", nameof(userId));
 
             var user = await _userRepository.ReadEntity(userId);
             if (user == null)
-                throw new ArgumentException("User does not exist.");
+                throw new ArgumentException("User does not exist.", nameof(userId));
 
             var incomes = await _incomeRepository.GetIncomesByUserId(userId);
             return incomes.Select(income => new IncomeDto().GetDto(income));
@@ -71,7 +75,7 @@ namespace ExpenseTracker.Services
             return await _incomeRepository.UpdateEntity(id, updatedIncome);
         }
 
-        public async Task<bool> DeleteIncomeAsync(Guid id)
+        public async Task<Income?> DeleteIncomeAsync(Guid id)
         {
             if (id == Guid.Empty)
                 throw new ArgumentException("Income ID cannot be empty.");
@@ -80,8 +84,7 @@ namespace ExpenseTracker.Services
             if (income == null)
                 throw new ArgumentException("Income does not exist.");
 
-            var deletedIncome = await _incomeRepository.DeleteEntity(id);
-            return deletedIncome != null;
+            return await _incomeRepository.DeleteEntity(id);
         }
     }
 }
