@@ -37,6 +37,7 @@ public static class Config
         services.AddScoped<IBudgetRepository, BudgetRepository>();
         services.AddScoped<IGoalRepository, GoalRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IExpenseRepository, ExpenseRepository>();
         return services;
     }
     
@@ -47,6 +48,7 @@ public static class Config
         services.AddScoped<IGoalService, GoalService>();
         services.AddScoped<IJwtGenerator, JwtGenerator>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IExpenseService, ExpenseService>();
         return services;
     }
 }
