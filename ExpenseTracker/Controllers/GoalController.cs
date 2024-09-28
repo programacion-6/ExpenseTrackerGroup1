@@ -1,11 +1,14 @@
+using System.Security.Claims;
 using ExpenseTracker.Dtos.GoalDtos;
 using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class GoalController : ControllerBase
     {
         private readonly IGoalService _goalService;
@@ -32,11 +35,12 @@ namespace ExpenseTracker.Controllers
             }
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetGoalsByUserId(Guid userId)
+        [HttpGet("user")]
+        public async Task<IActionResult> GetGoalsByUserId()
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var goals = await _goalService.GetGoalsByUserIdAsync(userId);
                 return Ok(goals);
             }
@@ -54,7 +58,8 @@ namespace ExpenseTracker.Controllers
 
             try
             {
-                var createdGoal = await _goalService.CreateGoalAsync(createGoalDto);
+                var userId = GetCurrentUserId();
+                var createdGoal = await _goalService.CreateGoalAsync(userId, createGoalDto);
                 return CreatedAtAction(nameof(GetGoalById), new { id = createdGoal.UserId }, createdGoal);
             }
             catch (ArgumentException ex)
@@ -81,6 +86,12 @@ namespace ExpenseTracker.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
         }
     }
 }

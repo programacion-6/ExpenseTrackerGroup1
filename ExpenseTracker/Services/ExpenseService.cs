@@ -20,16 +20,16 @@ public class ExpenseService : IExpenseService
          _userRepository = userRepository;
     }
 
-    public async Task<Expense> CreateExpenseAsync(CreateExpenseDto expenseDto)
+    public async Task<Expense> CreateExpenseAsync(Guid userId, CreateExpenseDto expenseDto)
     {
         if (expenseDto == null)
             throw new ArgumentNullException(nameof(expenseDto));
         
-        var user = await _userRepository.ReadEntity(expenseDto.UserId);
+        var user = await _userRepository.ReadEntity(userId);
         if (user == null)
                 throw new ArgumentException("User does not exist.");
-
-        var expense = expenseDto.GetEntity(null);
+        
+        var expense = expenseDto.GetEntity(new Expense{UserId = user.Id});
         var createdExpense = await _expenseRepository.CreateEntity(expense);
         return createdExpense;
     }

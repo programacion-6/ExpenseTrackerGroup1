@@ -15,16 +15,16 @@ namespace ExpenseTracker.Services
             _userRepository = userRepository;
         }
 
-        public async Task<GoalDto> CreateGoalAsync(CreateGoalDto goalDto)
+        public async Task<GoalDto> CreateGoalAsync(Guid userId, CreateGoalDto goalDto)
         {
             if (goalDto == null)
                 throw new ArgumentNullException(nameof(goalDto));
             if (goalDto.Deadline < DateTime.Now)
                 throw new ArgumentException("Cannot create a goal for a past date.");
-            var user = await _userRepository.ReadEntity(goalDto.UserId);
+            var user = await _userRepository.ReadEntity(userId);
             if (user == null)
                 throw new ArgumentException("User does not exist.");
-            var goal = goalDto.GetEntity(null);
+            var goal = goalDto.GetEntity(new Goal{UserId = userId});
             var createdGoal = await _goalRepository.CreateEntity(goal);
 
             return new GoalDto().GetDto(createdGoal);

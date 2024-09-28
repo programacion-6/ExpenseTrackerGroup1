@@ -1,12 +1,14 @@
 using ExpenseTracker.Domain;
 using ExpenseTracker.Dtos.UserDtos;
 using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

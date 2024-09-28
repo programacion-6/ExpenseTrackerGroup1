@@ -1,11 +1,15 @@
+using System.Security.Claims;
+using ExpenseTracker.Domain;
 using ExpenseTracker.Dtos.BudgetDtos;
 using ExpenseTracker.Interfaces.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BudgetController : ControllerBase
     {
         private readonly IBudgetService _budgetService;
@@ -36,10 +40,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet("monthly")]
-        public async Task<IActionResult> GetMonthlyBudget([FromQuery] Guid userId, [FromQuery] DateTime month)
+        public async Task<IActionResult> GetMonthlyBudget([FromQuery] DateTime month)
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var budget = await _budgetService.GetMonthlyBudget(userId, new DateTime(month.Year, month.Month, 1));
                 if (budget == null)
                 {
@@ -56,10 +61,11 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet("current")]
-        public async Task<IActionResult> GetCurrentMonthBudget([FromQuery] Guid userId)
+        public async Task<IActionResult> GetCurrentMonthBudget()
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var budget = await _budgetService.GetCurrentMonthBudget(userId);
                 if (budget == null)
                 {
@@ -78,16 +84,12 @@ namespace ExpenseTracker.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBudget([FromBody] CreateBudgetDto createBudgetDto)
         {
-            if (createBudgetDto == null)
-            {
-                return BadRequest("Budget data cannot be null.");
-            }
-
             try
             {
-                var budget = await _budgetService.CreateEntity(createBudgetDto);
+                var userId = GetCurrentUserId();
+                var budget = await _budgetService.CreateEntity(userId, createBudgetDto);
                 var budgetDto = new BudgetDto().GetDto(budget);
-                return CreatedAtAction(nameof(GetBudgetById), budget);
+                return CreatedAtAction(nameof(GetBudgetById),new { id = budgetDto.UserId }, budgetDto);
             }
             catch (ArgumentException ex)
             {
@@ -121,5 +123,10 @@ namespace ExpenseTracker.Controllers
             }
         }
         
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? Guid.Parse(userIdClaim.Value) : Guid.Empty;
+        }
     }
 }

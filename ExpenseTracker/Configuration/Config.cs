@@ -8,6 +8,7 @@ using ExpenseTracker.Persistence.Database.Interface;
 using ExpenseTracker.Repository;
 using ExpenseTracker.Service;
 using ExpenseTracker.Services;
+using ExpenseTracker.Utils;
 using Npgsql;
 
 namespace ExpenseTracker.Configuration;
@@ -46,6 +47,8 @@ public static class Config
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IBudgetService, BudgetService>();
         services.AddScoped<IGoalService, GoalService>();
+        services.AddScoped<IJwtGenerator, JwtGenerator>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IIncomeService, IncomeService>();
         return services;

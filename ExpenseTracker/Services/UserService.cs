@@ -74,6 +74,22 @@ public class UserService : IUserService
         return user;
     }
 
+    public async Task<User> CreateUser(CreateUserDto createUserDto)
+    {
+        if (!EmailValidator.IsValidEmail(createUserDto.Email))
+        {
+            throw new ArgumentException("Invalid email format.");
+        }
+
+        if (createUserDto.Password.Length < 6)
+        {
+            throw new ArgumentException("Password must be at least 6 characters long.");
+        }
+
+        var newUser = createUserDto.GetEntity(null);
+        return await _userRepository.CreateEntity(newUser);
+    }
+
     public async Task<List<User>> GetAllUsers()
     {
         return await _userRepository.GetAllEntities();
