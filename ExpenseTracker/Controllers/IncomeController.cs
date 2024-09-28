@@ -1,100 +1,124 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ExpenseTracker.Dtos.IncomeDtos;
-using ExpenseTracker.Interfaces;
 using ExpenseTracker.Interfaces.Service;
 
-[ApiController]
-[Route("api/[controller]")]
-public class IncomeController : ControllerBase
+namespace ExpenseTracker.Controllers
 {
-    private readonly IIncomeService _incomeService;
-
-    public IncomeController(IIncomeService incomeService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class IncomeController : ControllerBase
     {
-        _incomeService = incomeService;
-    }
+        private readonly IIncomeService _incomeService;
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateIncomeDto incomeDto)
-    {
-        if (incomeDto == null)
-            return BadRequest("Income data is required.");
-
-        try
+        public IncomeController(IIncomeService incomeService)
         {
-            var createdIncome = await _incomeService.CreateIncomeAsync(incomeDto);
-
-            return CreatedAtAction(nameof(Read), new { id = createdIncome.UserId }, createdIncome);
+            _incomeService = incomeService;
         }
-        catch (ArgumentException ex)
+
+        [HttpPost]
+        public async Task<IActionResult> CreateIncome([FromBody] CreateIncomeDto incomeDto)
         {
-            return BadRequest(ex.Message);
+            if (incomeDto == null)
+                return BadRequest("Income data is required.");
+
+            try
+            {
+                var createdIncome = await _incomeService.CreateIncomeAsync(incomeDto);
+                return CreatedAtAction(nameof(GetIncome), new { id = createdIncome.Id }, createdIncome);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-    }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Read(Guid id)
-    {
-        if (id == Guid.Empty)
-            return BadRequest("Income ID cannot be empty.");
-
-        try
+        [HttpGet]
+        public async Task<IActionResult> GetAllIncomes()
         {
-            var income = await _incomeService.GetIncomeByIdAsync(id);
-            if (income == null)
-                return NotFound($"Income with ID {id} not found.");
-
-            return Ok(income);
+            try
+            {
+                var incomes = await _incomeService.GetAllIncomesAsync();
+                return Ok(incomes);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        catch (ArgumentException ex)
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetIncome(Guid id)
         {
-            return BadRequest(ex.Message);
+            if (id == Guid.Empty)
+                return BadRequest("Income ID cannot be empty.");
+
+            try
+            {
+                var income = await _incomeService.GetIncomeByIdAsync(id);
+                if (income == null) return NotFound($"Income with ID {id} not found.");
+                return Ok(income);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-    }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateIncomeInDto updateIncomeDto)
-    {
-        if (id == Guid.Empty)
-            return BadRequest("Income ID cannot be empty.");
-
-        if (updateIncomeDto == null)
-            return BadRequest("Income data is required.");
-
-        try
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateIncome(Guid id, [FromBody] UpdateIncomeInDto updateIncomeDto)
         {
-            var result = await _incomeService.UpdateIncomeAsync(id, updateIncomeDto);
-            if (!result)
-                return NotFound($"Income with ID {id} not found or update failed.");
+            if (id == Guid.Empty)
+                return BadRequest("Income ID cannot be empty.");
 
-            return Ok("Income updated successfully.");
+            if (updateIncomeDto == null)
+                return BadRequest("Income data is required.");
+
+            try
+            {
+                var result = await _incomeService.UpdateIncomeAsync(id, updateIncomeDto);
+                if (!result)
+                    return NotFound($"Income with ID {id} not found or update failed.");
+
+                return Ok("Income updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        catch (ArgumentException ex)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteIncome(Guid id)
         {
-            return BadRequest(ex.Message);
+            if (id == Guid.Empty)
+                return BadRequest("Income ID cannot be empty.");
+
+            try
+            {
+                var deletedIncome = await _incomeService.DeleteIncomeAsync(id);
+                return Ok("Income deleted successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-    }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        if (id == Guid.Empty)
-            return BadRequest("Income ID cannot be empty.");
-
-        try
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetIncomesByUserId(Guid userId)
         {
-            var deletedIncome = await _incomeService.DeleteIncomeAsync(id);
-            if (!deletedIncome)
-                return NotFound($"Income with ID {id} not found.");
+            if (userId == Guid.Empty)
+                return BadRequest("User ID cannot be empty.");
 
-            return Ok("Income deleted successfully.");
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
+            try
+            {
+                var incomes = await _incomeService.GetIncomesByUserIdAsync(userId);
+                return Ok(incomes);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
