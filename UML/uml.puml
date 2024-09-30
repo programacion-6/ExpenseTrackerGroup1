@@ -25,10 +25,6 @@ package "Model" {
         +CreatedAt: DateTime
     }
 
-    class Insight {
-        +ExpenseId: Guid
-        +IncomeId : Guid
-    }
 
     class Budget {
         +UserId: Guid
@@ -46,23 +42,72 @@ package "Model" {
 
 }
 
-package Helpers {
-    class QueryObject {
-        +SortBy : String?
-        +IsDescending : bool
-        +PageNumber : int
-        +PageSize : int
-    }
-}
 
 package Interfaces {
+
+    package Service {
+
+        interface IAuthService {
+            + Task<string> Register(string name, string email, string password)
+            + Task<string> Login(string email, string password)
+        }
+
+        interface IBudgetService {
+            + Task<Budget?> GetMonthlyBudget(Guid userId, DateTime month)
+            + Task<Budget?> GetCurrentMonthBudget(Guid userId)
+            + Task<Budget?> ReadEntity(Guid entityId)
+            + Task<Budget> CreateEntity(Guid userId, CreateBudgetDto budgetDto)
+            + Task<bool> UpdateEntity(Guid entityId, UpdateBudgetDto budgetDto)
+        }
+
+        interface IExpenseService {
+            + Task<ExpenseDto?> GetExpenseByIdAsync(Guid expenseId)
+            + Task<List<Expense>> GetAllExpensesAsync()
+            + Task<Expense> CreateExpenseAsync(Guid UserId, CreateExpenseDto expenseDto)
+            + Task<bool> UpdateExpenseAsync(Guid expenseId, UpdateExpenseDto expenseDto)
+            + Task<Expense?> DeleteExpenseAsync(Guid expenseId)
+        }
+
+        interface IGoalService {
+            + Task<GoalDto> CreateGoalAsync(Guid userId, CreateGoalDto goalDto)
+            + Task<GoalDto?> GetGoalByIdAsync(Guid id)
+            + Task<IEnumerable<GoalDto>> GetGoalsByUserIdAsync(Guid userId)
+            + Task<bool> UpdateGoalAsync(Guid id, UpdateGoalDto goalDto)
+        }
+
+        interface IIncomeService {
+            + Task<IncomeDto?> GetIncomeByIdAsync(Guid id)
+            + Task<List<Income>> GetAllIncomesAsync()
+            + Task<Income> CreateIncomeAsync(Guid userId, CreateIncomeDto incomeDto)
+            + Task<bool> UpdateIncomeAsync(Guid id, UpdateIncomeInDto incomeDto)
+            + Task<Income?> DeleteIncomeAsync(Guid id)
+            + Task<IEnumerable<IncomeDto>> GetIncomesByUserIdAsync(Guid userId)
+        }
+
+        interface IUserService {
+            + Task<User?> GetUserById(Guid userId)
+            + Task<List<User>> GetAllUsers()
+            + Task<User?> UpdateUser(Guid userId, UserUpdateDto userUpdateDto)
+            + Task<User?> DeleteUser(Guid userId)
+            + Task<User?> GetUserByEmail(string email)
+            + Task<User> CreateUser(CreateUserDto createUserDto)
+        }
+    }
 
     interface IEntity {
         +Id: Guid
     }
 
-    interface IDto<T> {
-        + getDto() : T
+    interface IOutDto<T, R> {
+        {abstract} T GetDto(R entity)
+    }
+
+    interface IInDto<T> {
+        {abstract} T GetEntity(T? entity)
+    }
+
+    interface IJwtGenerator {
+        +string GenerateToken(User user)
     }
 
     package CrudOperations {
@@ -87,41 +132,34 @@ package Interfaces {
         }
     }
 
-    interface IEmailService {
-        +SendEmail(): Task<bool>
+    package Repository {
+
+        interface IBudgetRepository {
+            +Task<Budget?> GetMonthlyBudget(Guid userId, DateTime month)
+            +Task<Budget?> GetCurrentMonthBudget(Guid userId)
+        }
+
+        interface IExpenseRepository {
+        }
+
+        interface IGoalRepository {
+            +Task<IEnumerable<Goal>> GetGoalsByUserId(Guid userId)
+        }
+
+        interface IIncomeRepository {
+            +Task<IEnumerable<Income>> GetIncomesByUserId(Guid userId)
+        }
+
+        interface IUserRepository {
+            +Task<User?> GetUserByEmail(string email)
+        }
     }
 
-    interface IAuthRepository {
-        +Login(): Task<String?>
-        +ResetPassword(): Task<bool>
-    }
-
-    interface IInsightRepository {
-        +GetSummaryByMonth(DateTime month) : Insight
-    }
-
-    interface ITokenService {
-        +CreateToken(User user): String
-    }
-
-    interface IExpenseRepository {
-
-    }
-
-    interface IIncomeRepository {
-
-    }
-
-    interface IBudgetRepository {
-
-    }
-
-    interface IGoalRepository {
-
-    }
-
-    IAuthRepository --|> ICreateOperation 
-    IAuthRepository --|> IUpdateOperation 
+    IUserRepository --|> IReadOperation
+    IUserRepository --|> IGetAllOperation
+    IUserRepository --|> IUpdateOperation
+    IUserRepository --|> IDeleteOperation
+    IUserRepository --|> ICreateOperation
 
     IExpenseRepository --|> ICreateOperation
     IExpenseRepository --|> IReadOperation 
@@ -136,33 +174,39 @@ package Interfaces {
     IIncomeRepository --|> IGetAllOperation 
 
     IBudgetRepository --|> ICreateOperation
-    IBudgetRepository --|> IReadOperation 
+    IBudgetRepository --|> IReadOperation
+    IBudgetRepository --|> IUpdateOperation
 
     IGoalRepository --|> ICreateOperation
     IGoalRepository --|> IReadOperation 
+    IGoalRepository --|> IUpdateOperation
 
 } 
 
 package Dtos {
-    package AuthDtos {
+    package UserDtos {
         class LoginDto {
             +Username: String
             +Password: String
         }
-        class NewUserDto {
-            +Username: String
-            +Email: String
-            +Token: String
+
+        class CreateUserDto {
+            + string Name
+            + string Email
+            + string Password
+            + User GetEntity(User? entity)
         }
+
         class RegisterDto {
             +Username: String?
             +Email: String?
             +Password: String?
         }
-        class UpdateUserDto {
-            +Name: String
-            +Email: String
-            +Password: String
+        
+        class UserUpdateDto {
+            + string? Name
+            + string? Email
+            + User GetEntity(User? entity)
         }
     }
 
@@ -181,6 +225,14 @@ package Dtos {
             +Category: String
             +Date: DateTime
         }
+
+        class CreateExpenseDto {
+            + decimal Amount
+            + string Description
+            + string Category
+            + DateTime Date
+            + Expense GetEntity(Expense? entity)
+        }
     }
 
     package IncomeDtos {
@@ -197,6 +249,13 @@ package Dtos {
             +Source: String
             +Date: DateTime
         }
+
+        class CreateIncomeDto {
+            + decimal Amount
+            + string Source
+            + DateTime Date
+            + Income GetEntity(Income? entity)
+        }
     }
 
     package BudgetDtos {
@@ -205,6 +264,18 @@ package Dtos {
             +Month: DateTime
             +BudgetAmount: double
         }
+
+        class CreateBudgetDto {
+            + decimal BudgetAmount
+            + DateTime Month
+            + Budget GetEntity(Budget? entity)
+        }
+
+        class UpdateBudgetDto {
+            + decimal BudgetAmount
+            + Budget GetEntity(Budget? entity)
+        }
+
     }
 
     package GoalDtos {
@@ -215,130 +286,307 @@ package Dtos {
             +CurrentAmount: double
             +CreatedAt: DateTime
         }
+
+        class CreateGoalDto {
+            + decimal GoalAmount
+            + DateTime Deadline
+            + Goal GetEntity(Goal? entity)
+        }
+
+        class UpdateGoalDto {
+            + decimal? GoalAmount
+            + DateTime? Deadline
+            + decimal? CurrentAmount
+            + Goal GetEntity(Goal? entity)
+        }
     }
 }
 
-LoginDto --|> IDto
-GoalDto --|> IDto
-BudgetDto --|> IDto
-UpdateIncomeDto --|> IDto
-IncomeDto --|> IDto
-UpdateExpenseDto --|> IDto
-ExpenseDto --|> IDto
-UpdateUserDto --|> IDto
-RegisterDto --|> IDto
-NewUserDto --|> IDto
+
+GoalDto --|> IOutDto
+CreateGoalDto --|> IInDto
+UpdateGoalDto --|> IInDto
+BudgetDto --|> IOutDto
+CreateBudgetDto --|> IInDto
+UpdateBudgetDto --|> IInDto
+UpdateIncomeDto --|> IInDto
+CreateIncomeDto --|> IInDto
+IncomeDto --|> IOutDto
+UpdateExpenseDto --|> IInDto
+CreateExpenseDto --|> IInDto
+ExpenseDto --|> IOutDto
+UserUpdateDto --|> IInDto
+
+CreateUserDto --|> IInDto
 
 
 
-package Service {
+package Services {
 
-    class EmailService {
-        +SetEmail():String
+   class AuthService {
+        + IUserRepository _userRepository
+        + IJwtGenerator _jwtTokenGenerator
+        + string _secretKey
+        + Register(string name, string email, string password) : Task<string>
+        + Login(string email, string password) : Task<string>
     }
 
-    class TokenService {
-        -_config: IConfiguration
-        -_key: SymmetricSecurityKey
+    class BudgetService {
+        + IBudgetRepository _budgetRepository
+        + IUserRepository _userRepository
+        + GetMonthlyBudget(Guid userId, DateTime month) : Task<Budget?>
+        + GetCurrentMonthBudget(Guid userId) : Task<Budget?>
+        + ReadEntity(Guid entityId) : Task<Budget?>
+        + CreateEntity(Guid userId, CreateBudgetDto budgetDto) : Task<Budget>
+        + UpdateEntity(Guid entityId, UpdateBudgetDto budgetDto) : Task<bool>
+    }
+
+    class ExpenseService {
+        - IExpenseRepository _expenseRepository
+        - IUserRepository _userRepository
+        + CreateExpenseAsync(Guid userId, CreateExpenseDto expenseDto) : Task<Expense>
+        + DeleteExpenseAsync(Guid expenseId) : Task<Expense?>
+        + GetAllExpensesAsync() : Task<List<Expense>>
+        + GetExpenseByIdAsync(Guid expenseId) : Task<ExpenseDto?>
+        + UpdateExpenseAsync(Guid expenseId, UpdateExpenseDto expenseDto) : Task<bool>
+    }
+
+    class GoalService {
+        + IGoalRepository _goalRepository
+        + IUserRepository _userRepository
+        + CreateGoalAsync(Guid userId, CreateGoalDto goalDto) : Task<GoalDto>
+        + GetGoalByIdAsync(Guid id) : Task<GoalDto?>
+        + GetGoalsByUserIdAsync(Guid userId) : Task<IEnumerable<GoalDto>>
+        + UpdateGoalAsync(Guid id, UpdateGoalDto goalDto) : Task<bool>
+    }
+
+    class IncomeService {
+        - IIncomeRepository _incomeRepository
+        - IUserRepository _userRepository
+        + CreateIncomeAsync(Guid userId, CreateIncomeDto incomeDto) : Task<Income>
+        + GetAllIncomesAsync() : Task<List<Income>>
+        + GetIncomeByIdAsync(Guid id) : Task<IncomeDto?>
+        + GetIncomesByUserIdAsync(Guid userId) : Task<IEnumerable<IncomeDto>>
+        + UpdateIncomeAsync(Guid id, UpdateIncomeInDto incomeDto) : Task<bool>
+        + DeleteIncomeAsync(Guid id) : Task<Income?>
+    }
+
+    class UserService {
+        - IUserRepository _userRepository
+        + GetUserById(Guid userId) : Task<User?>
+        + UpdateUser(Guid userId, UserUpdateDto userUpdateDto) : Task<User?>
+        + DeleteUser(Guid userId) : Task<User?>
+        + GetUserByEmail(string email) : Task<User?>
+        + CreateUser(CreateUserDto createUserDto) : Task<User>
+        + GetAllUsers() : Task<List<User>>
     }
 
 }
+
+AuthService --> IAuthService
+AuthService --> IUserRepository
+AuthService --> IJwtGenerator
+
+BudgetService --> IBudgetService
+BudgetService --> IBudgetRepository
+BudgetService --> IUserRepository
+
+ExpenseService --> IExpenseService
+ExpenseService --> IExpenseRepository
+ExpenseService --> IUserRepository
+
+GoalService --> IGoalService
+GoalService --> IGoalRepository
+GoalService --> IUserRepository
+
+IncomeService --> IIncomeService
+IncomeService --> IIncomeRepository
+IncomeService --> IUserRepository
+
+UserService --> IUserService
+UserService --> IUserRepository
 
 package Repository {
 
-    class AuthRepository {
-        
-    }
-
-    class InsightRepository {
-        
+    class BudgetRepository {
+        - IDbConnectionFactory _dbConnection
+        + Task<Budget?> ReadEntity(Guid entityId)
+        + Task<Budget> CreateEntity(Budget entityModel)
+        + Task<bool> UpdateEntity(Guid entityId, Budget entity)
+        + Task<Budget?> GetMonthlyBudget(Guid userId, DateTime month)
+        + Task<Budget?> GetCurrentMonthBudget(Guid userId)
     }
 
     class ExpenseRepository {
-
-    }
-
-    class IncomeRepository {
-
-    }
-
-    class BudgetRepository {
-
+        - IDbConnectionFactory _dbConnection
+        + Task<Expense> CreateEntity(Expense entityModel)
+        + Task<Expense?> DeleteEntity(Guid entityId)
+        + Task<List<Expense>> GetAllEntities()
+        + Task<Expense?> ReadEntity(Guid entityId)
+        + Task<bool> UpdateEntity(Guid entityId, Expense entity)
     }
 
     class GoalRepository {
+        - IDbConnectionFactory _dbConnection
+        + Task<Goal> CreateEntity(Goal entityModel)
+        + Task<Goal?> ReadEntity(Guid entityId)
+        + Task<IEnumerable<Goal>> GetGoalsByUserId(Guid userId)
+        + Task<bool> UpdateEntity(Guid entityId, Goal entity)
+    }
+
+    class IncomeRepository {
+        - IDbConnectionFactory _dbConnection
+        + Task<Income> CreateEntity(Income incomeModel)
+        + Task<Income?> ReadEntity(Guid entityId)
+        + Task<bool> UpdateEntity(Guid entityId, Income entity)
+        + Task<Income?> DeleteEntity(Guid entityId)
+        + Task<IEnumerable<Income>> GetIncomesByUserId(Guid userId)
+        + Task<List<Income>> GetAllEntities()
+    }
+
+    class UserRepository {
+        - IDbConnectionFactory _dbConnection
+        + Task<User?> ReadEntity(Guid entityId)
+        + Task<List<User>> GetAllEntities()
+        + Task<bool> UpdateEntity(Guid entityId, User entity)
+        + Task<User?> DeleteEntity(Guid entityId)
+        + Task<User?> GetUserByEmail(string email)
+        + Task<User> CreateEntity(User entityModel)
+    }
+
+}
+
+package Database {
+
+    package Infraestructure {
+
+        class DbConnectionFactory {
+            - DbOptions _options
+            + DbConnectionFactory(IOptions<DbOptions> options)
+            + CreateConnectionAsync(): Task<IDbConnection>
+        }
+
+        class DbInit {
+            - DbOptions _options
+            + DbInit(IOptions<DbOptions> options)
+            + InitializeDatabase(): void
+        }
 
     }
+
+    package Interface {
+
+        interface IDbConnectionFactory {
+            + CreateConnectionAsync(): Task<IDbConnection>
+        }
+
+        interface IDbInit {
+            + InitializeDatabase(): void
+        }
+        
+    }
+
+    class DbOptions {
+        + string? DefaultConnection
+        + string? ScriptsPath
+    }
+
+
+    DbConnectionFactory --> IDbConnectionFactory
+    DbInit --> IDbInit
+
+    DbConnectionFactory --> DbOptions
+    DbInit --> DbOptions
+
+    BudgetRepository --> IDbConnectionFactory
+    ExpenseRepository --> IDbConnectionFactory
+    GoalRepository --> IDbConnectionFactory
+    IncomeRepository --> IDbConnectionFactory
+    UserRepository --> IDbConnectionFactory
 
 }
 
 package Controllers {
     class AuthController {
-        +AuthRepository: IAuthRepository
-        +TokenService: ITokenService
-        +EmailService: IEmailService
-        +Login(LoginDto lodingDto)
-        +Register(RegisterDto registerDto)
-        +ResetPassword(UpdateUserDto updateUserDto)
-    }
-
-    class ExpenseController {
-        +ExpenseRepository: IExpenseRepository
-        +Create(ExpenseDto dto)
-        +Delete(ExpenseDto dto)
-        +Update(ExpenseDto dto)
-        +Delete(ExpenseDto dto)
-    }
-
-    class IncomeController {
-        +IncomeRepository: IIncomeRepository
-        +Create(IncomeDto dto)
-        +Delete(IncomeDto dto)
-        +Update(IncomeDto dto)
-        +Delete(IncomeDto dto)
+        - IAuthService _authService
+        + Task<IActionResult> Register(RegisterDto registerDto)
+        + Task<IActionResult> Login(LoginDto loginDto)
     }
 
     class BudgetController {
-        +BudgetRepository: IBudgetRepository
-        +Create(BudgetDto dto)
-        +Read(BudgetDto dto)
+        - IBudgetService _budgetService
+        + Task<IActionResult> GetBudgetById(Guid id)
+        + Task<IActionResult> GetMonthlyBudget(DateTime month)
+        + Task<IActionResult> GetCurrentMonthBudget()
+        + Task<IActionResult> CreateBudget(CreateBudgetDto createBudgetDto)
+        + Task<IActionResult> UpdateBudget(Guid id, UpdateBudgetDto updateBudgetDto)
+        - Guid GetCurrentUserId()
+    }
+
+    class ExpenseController {
+        - IExpenseService _expenseService
+        + Task<IActionResult> CreateExpense(CreateExpenseDto createdExpenseDto)
+        + Task<IActionResult> GetAllExpenses()
+        + Task<IActionResult> GetExpense(Guid id)
+        + Task<IActionResult> UpdateExpense(Guid id, UpdateExpenseDto updateExpenseDto)
+        + Task<IActionResult> DeleteExpense(Guid id)
+        - Guid GetCurrentUserId()
     }
 
     class GoalController {
-        +GoalRepository: IGoalRepository
-        +Create(GoalDto dto)
-        +Read(GoalDto dto)
+        - IGoalService _goalService
+        + Task<IActionResult> GetGoalById(Guid id)
+        + Task<IActionResult> GetGoalsByUserId()
+        + Task<IActionResult> CreateGoal(CreateGoalDto createGoalDto)
+        + Task<IActionResult> UpdateGoal(Guid id, UpdateGoalDto updateGoalDto)
+        - Guid GetCurrentUserId()
     }
 
-    class InsightController {
-        +InsightRepository: IInsightRepository
-        +GetInsightByMonth(DateTime time)
+    class IncomeController {
+        - IIncomeService _incomeService
+        + Task<IActionResult> CreateIncome(CreateIncomeDto incomeDto)
+        + Task<IActionResult> GetAllIncomes()
+        + Task<IActionResult> GetIncome(Guid id)
+        + Task<IActionResult> UpdateIncome(Guid id, UpdateIncomeInDto updateIncomeDto)
+        + Task<IActionResult> DeleteIncome(Guid id)
+        + Task<IActionResult> GetIncomesByUserId()
+        - Guid GetCurrentUserId()
     }
+
+    class UserController {
+        - IUserService _userService
+        + Task<IActionResult> GetUserById(Guid id)
+        + Task<IActionResult> GetUserByEmail(string email)
+        + Task<IActionResult> GetAllUsers()
+        + Task<IActionResult> UpdateUser(Guid id, UserUpdateDto userDto)
+        + Task<IActionResult> DeleteUser(Guid id)
+    }
+
 }
 
 User --|> IEntity
-Insight --|> IEntity
 Expense --|> IEntity
 Income --|> IEntity
 Budget --|> IEntity
 Goal --|> IEntity
 
-EmailService --|> IEmailService
-TokenService --|> ITokenService
 
-AuthRepository --|> IAuthRepository
-InsightRepository --|> IInsightRepository
 ExpenseRepository --|> IExpenseRepository
 IncomeRepository --|> IIncomeRepository
 BudgetRepository --|> IBudgetRepository
 GoalRepository --|> IGoalRepository
+UserRepository --|> IUserRepository
 
-AuthController ..> AuthRepository
-InsightController ..> InsightRepository
-ExpenseController ..> ExpenseRepository
-IncomeController ..> IncomeRepository
-BudgetController..> BudgetRepository
-GoalController..> GoalRepository
+
+AuthController --> IAuthService
+BudgetController --> IBudgetService
+ExpenseController --> IExpenseService
+GoalController --> IGoalService
+IncomeController --> IIncomeService
+UserController --> IUserService
+
+AuthController --> LoginDto : uses
+AuthController --> RegisterDto : uses
 
 
 @enduml
