@@ -1,5 +1,7 @@
 using System.Data;
 using System.Data.Common;
+using ExpenseTracker.Dtos.IncomeDtos;
+using ExpenseTracker.Dtos.GoalDtos;
 using ExpenseTracker.Interfaces;
 using ExpenseTracker.Interfaces.Service;
 using ExpenseTracker.Persistence;
@@ -9,6 +11,8 @@ using ExpenseTracker.Repository;
 using ExpenseTracker.Service;
 using ExpenseTracker.Services;
 using ExpenseTracker.Utils;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Npgsql;
 
 namespace ExpenseTracker.Configuration;
@@ -51,6 +55,10 @@ public static class Config
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IIncomeService, IncomeService>();
+        services.AddScoped<IValidator<CreateIncomeDto>,CreateIncomeDtoValidator>();
+        services.AddScoped<IValidator<UpdateIncomeInDto>,UpdateIncomeInDtoValidator>();
+        services.AddScoped<IValidator<CreateGoalDto>,CreateGoalDtoValidator>();
+        services.AddScoped<IValidator<UpdateGoalDto>,UpdateGoalDtoValidator>();
         return services;
     }
 }
