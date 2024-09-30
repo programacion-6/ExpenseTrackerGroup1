@@ -39,6 +39,7 @@ public static class Config
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
         services.AddScoped<IIncomeRepository, IncomeRepository>();
+        services.AddScoped<IMetricRepository, MetricRepository>();
         return services;
     }
     
@@ -51,6 +52,7 @@ public static class Config
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IExpenseService, ExpenseService>();
         services.AddScoped<IIncomeService, IncomeService>();
+        services.AddScoped<IMetricService, MetricService>();
         return services;
     }
 }
