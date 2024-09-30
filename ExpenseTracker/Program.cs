@@ -5,6 +5,8 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using ExpenseTracker.Configuration;
 using ExpenseTracker.Utils;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 Env.Load();
