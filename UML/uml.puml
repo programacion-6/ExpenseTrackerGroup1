@@ -42,14 +42,6 @@ package "Model" {
 
 }
 
-package Helpers {
-    class QueryObject {
-        +SortBy : String?
-        +IsDescending : bool
-        +PageNumber : int
-        +PageSize : int
-    }
-}
 
 package Interfaces {
 
